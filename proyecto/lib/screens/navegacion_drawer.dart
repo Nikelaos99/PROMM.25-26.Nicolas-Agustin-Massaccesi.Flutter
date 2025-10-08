@@ -68,5 +68,19 @@ Widget buildMenuItems(BuildContext context) => ListView(
         Navigator.pushReplacementNamed(context, '/iconos');
       },
     ),
+    ListTile(
+      leading: const Icon(Icons.keyboard_arrow_up_outlined),
+      title: const Text('Pirámide'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/piramide');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.text_snippet_outlined),
+      title: const Text('Textos'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/textos');
+      },
+    ),
   ],
 );
