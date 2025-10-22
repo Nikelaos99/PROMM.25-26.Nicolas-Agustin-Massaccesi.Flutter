@@ -8,6 +8,8 @@ class AppRoutes {
   static const String iconos = '/iconos';
   static const String piramide = '/piramide';
   static const String textos = '/textos';
+  static const String reto = '/reto';
+  static const String instagram = '/instagram';
 
   // Mapa de rutas
   static final Map<String, WidgetBuilder> routes = {
@@ -17,5 +19,7 @@ class AppRoutes {
     iconos: (context) => const Iconos(),
     piramide: (context) => const Piramide(),
     textos: (context) => const Textos(),
+    reto: (context) => const Reto(),
+    instagram: (context) => const Instagram(),
   };
 }

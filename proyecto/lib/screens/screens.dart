@@ -7,6 +7,8 @@ export "fotos_en_columna.dart";
 export "navegacion_drawer.dart";
 export 'piramide.dart';
 export 'textos.dart';
+export "instagram_main.dart";
+export "reto.dart";
 
 // Utilidades
 

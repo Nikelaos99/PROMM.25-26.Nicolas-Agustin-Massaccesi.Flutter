@@ -28,6 +28,18 @@ class FotosEnColumna extends StatelessWidget {
             width: 100,
             height: 100,
           ),
+          const SizedBox(height: 10),
+          Image.network(
+            'https://picsum.photos/100?image=30',
+            width: 100,
+            height: 100,
+          ),
+          const SizedBox(height: 10),
+          Image.network(
+            'https://picsum.photos/100?image=35',
+            width: 100,
+            height: 100,
+          ),
         ],
       ),
     ),

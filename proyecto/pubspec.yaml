@@ -66,12 +66,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
 
   assets:
-    - assets/images/piramide/capybara.jpg
-    - assets/images/piramide/conejo.jpg
-    - assets/images/piramide/huron.jpg
-    - assets/images/piramide/perro.jpg
-    - assets/images/piramide/cacatua.jpg
-    - assets/images/piramide/gato.jpg
+    - assets/images/piramide/
+    - assets/images/instagram/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

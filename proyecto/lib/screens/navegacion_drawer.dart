@@ -82,5 +82,19 @@ Widget buildMenuItems(BuildContext context) => ListView(
         Navigator.pushReplacementNamed(context, '/textos');
       },
     ),
+    ListTile(
+      leading: const Icon(Icons.star),
+      title: const Text('Reto'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/reto');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.camera_alt),
+      title: const Text('Instagram'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/instagram');
+      },
+    ),
   ],
 );
