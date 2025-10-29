@@ -1,20 +1,29 @@
+// Importa todas las pantallas y utilidades necesarias desde el archivo centralizado de exports
 import 'package:proyecto/screens/screens.dart';
 
+// Widget que representa una pirámide de animales con imágenes y etiquetas
 class Piramide extends StatelessWidget {
-  const Piramide({super.key});
+  const Piramide({super.key}); // Constructor constante con clave opcional
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    // Drawer lateral para navegación entre pantallas
     drawer: const NavegacionDrawer(),
+
+    // AppBar superior con título fijo
     appBar: AppBar(title: const Text('Pirámide')),
+
+    // Cuerpo centrado vertical y horizontalmente
     body: Center(
       child: Builder(
         builder: (context) {
+          // Obtiene el ancho de pantalla para adaptar el diseño
           final screenWidth = MediaQuery.of(context).size.width;
 
           double imageSize;
           double fontSize;
 
+          // Define tamaños de imagen y texto según el ancho de pantalla
           if (screenWidth < 600) {
             imageSize = 80;
             fontSize = 14;
@@ -26,9 +35,11 @@ class Piramide extends StatelessWidget {
             fontSize = 18;
           }
 
+          // Construye la pirámide con filas de imágenes y etiquetas
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              // 🟦 Nivel superior: 1 imagen
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -44,6 +55,8 @@ class Piramide extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // 🟨 Segundo nivel: 2 imágenes
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -70,6 +83,8 @@ class Piramide extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // 🟥 Tercer nivel: 3 imágenes
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

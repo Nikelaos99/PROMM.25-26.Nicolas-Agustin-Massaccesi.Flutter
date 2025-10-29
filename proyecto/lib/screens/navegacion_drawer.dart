@@ -96,5 +96,12 @@ Widget buildMenuItems(BuildContext context) => ListView(
         Navigator.pushReplacementNamed(context, '/instagram');
       },
     ),
+    ListTile(
+      leading: const Icon(Icons.numbers),
+      title: const Text('Contador'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/contador');
+      },
+    ),
   ],
 );
