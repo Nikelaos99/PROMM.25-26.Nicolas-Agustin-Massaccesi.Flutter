@@ -11,6 +11,8 @@ export 'textos.dart'; // Pantalla con textos estilizados
 export "instagram_main.dart"; // Simulación o diseño inspirado en Instagram
 export "reto.dart"; // Pantalla de desafío o actividad interactiva
 export "contador.dart"; // Pantalla con contador
+export "colores_aleatorios.dart"; // Colores aleatorios revisado
+export "juego.dart"; // Pantalla con juego de hacer clic en imagenes
 
 // 🛠️ Utilidades y configuración global
 

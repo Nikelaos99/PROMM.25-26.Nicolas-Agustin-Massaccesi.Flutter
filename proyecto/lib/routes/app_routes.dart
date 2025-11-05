@@ -17,6 +17,9 @@ class AppRoutes {
   static const String instagram = '/instagram'; // Pantalla estilo Instagram
   static const String contador =
       '/contador'; // Pantalla con contador interactivo
+  static const String colores = '/colores_aleatorios';
+  static const String juego =
+      '/juego'; // Pantalla con juego de hacer clic en imagenes
 
   // 🗺️ Mapa de rutas que vincula cada nombre con su widget correspondiente
   // Este mapa se usa por Flutter para construir la pantalla cuando se navega a una ruta
@@ -30,5 +33,7 @@ class AppRoutes {
     reto: (context) => const Reto(),
     instagram: (context) => const Instagram(),
     contador: (context) => const Contador(),
+    colores: (context) => const RandomColors(),
+    juego: (context) => const Juego(),
   };
 }

@@ -1,35 +1,46 @@
+// Importa Material y los exports centrales del proyecto (widgets compartidos, rutas, etc.)
 import 'package:flutter/material.dart';
 import 'package:proyecto/screens/screens.dart';
 
+// Drawer reutilizable para navegación lateral
 class NavegacionDrawer extends StatelessWidget {
   const NavegacionDrawer({super.key});
 
   @override
   Widget build(BuildContext context) => Drawer(
+    // Column principal: header fijo arriba y lista de opciones que ocupa el resto
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        // Cabecera con avatar, nombre y email
         buildHeader(context),
+        // El ListView de opciones queda dentro de un Expanded para ocupar el espacio restante
         Expanded(child: buildMenuItems(context)),
       ],
     ),
   );
 }
 
+// Cabecera del Drawer
 Widget buildHeader(BuildContext context) => Container(
+  // Fondo azul oscuro para contraste
   color: Colors.blue.shade700,
+  // Padding superior igual al inset del sistema (status bar) para evitar solapamiento
   padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
   child: const Column(
     children: [
+      // Avatar circular con imagen remota
       CircleAvatar(
         radius: 52,
         backgroundImage: NetworkImage('https://picsum.photos/250?image=22'),
       ),
       SizedBox(height: 12),
+      // Nombre del usuario en grande y en blanco
       Text(
         'Nicolás Massaccesi',
         style: TextStyle(fontSize: 28, color: Colors.white),
       ),
+      // Email en tamaño menor
       Text(
         'nicomassaccesi@outlook.com',
         style: TextStyle(fontSize: 16, color: Colors.white),
@@ -38,12 +49,15 @@ Widget buildHeader(BuildContext context) => Container(
   ),
 );
 
+// Lista de ítems del menú del Drawer
 Widget buildMenuItems(BuildContext context) => ListView(
   children: [
+    // Cada ListTile muestra un ícono, un texto y navega a la ruta correspondiente
     ListTile(
       leading: const Icon(Icons.home_outlined),
       title: const Text('Nombre y Repositorio'),
       onTap: () {
+        // Reemplaza la ruta actual por la de inicio
         Navigator.pushReplacementNamed(context, '/');
       },
     ),
@@ -101,6 +115,20 @@ Widget buildMenuItems(BuildContext context) => ListView(
       title: const Text('Contador'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/contador');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.color_lens),
+      title: const Text('Colores Aleatorios'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/colores_aleatorios');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.gamepad),
+      title: const Text('Juego'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/juego');
       },
     ),
   ],
