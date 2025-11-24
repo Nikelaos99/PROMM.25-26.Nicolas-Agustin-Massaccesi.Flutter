@@ -58,77 +58,105 @@ Widget buildMenuItems(BuildContext context) => ListView(
       title: const Text('Nombre y Repositorio'),
       onTap: () {
         // Reemplaza la ruta actual por la de inicio
-        Navigator.pushReplacementNamed(context, '/');
+        Navigator.pushReplacementNamed(context, '/ejercicio1_home_screen');
       },
     ),
     ListTile(
-      leading: const Icon(Icons.table_rows),
-      title: const Text('Fotos en Fila'),
+      leading: const Icon(Icons.contact_emergency),
+      title: const Text('Imagen Representativa'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/fotos_fila');
+        Navigator.pushReplacementNamed(
+          context,
+          '/ejercicio2_imagen_representativa',
+        );
       },
     ),
     ListTile(
-      leading: const Icon(Icons.view_column),
+      leading: const Icon(Icons.view_column_outlined),
       title: const Text('Fotos en Columna'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/fotos_columna');
+        Navigator.pushReplacementNamed(context, '/ejercicio3_fotos_en_columna');
       },
     ),
     ListTile(
       leading: const Icon(Icons.workspaces_outline),
       title: const Text('Iconos'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/iconos');
+        Navigator.pushReplacementNamed(context, '/ejercicio4_iconos');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.view_column),
+      title: const Text('Fotos en Columna 2'),
+      onTap: () {
+        Navigator.pushReplacementNamed(
+          context,
+          '/ejercicio5_fotos_en_columna2',
+        );
+      },
+    ),
+
+    ListTile(
+      leading: const Icon(Icons.text_snippet_outlined),
+      title: const Text('Textos'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/ejercicio6_textos');
+      },
+    ),
+    ListTile(
+      leading: const Icon(Icons.photo_library_outlined),
+      title: const Text('Imágenes Repetidas'),
+      onTap: () {
+        Navigator.pushReplacementNamed(
+          context,
+          '/ejercicio7_imagenes_repetidas',
+        );
       },
     ),
     ListTile(
       leading: const Icon(Icons.keyboard_arrow_up_outlined),
       title: const Text('Pirámide'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/piramide');
-      },
-    ),
-    ListTile(
-      leading: const Icon(Icons.text_snippet_outlined),
-      title: const Text('Textos'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/textos');
+        Navigator.pushReplacementNamed(context, '/ejercicio8_piramide');
       },
     ),
     ListTile(
       leading: const Icon(Icons.star),
       title: const Text('Reto'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/reto');
-      },
-    ),
-    ListTile(
-      leading: const Icon(Icons.camera_alt),
-      title: const Text('Instagram'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/instagram');
+        Navigator.pushReplacementNamed(context, '/ejercicio9_reto');
       },
     ),
     ListTile(
       leading: const Icon(Icons.numbers),
       title: const Text('Contador'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/contador');
+        Navigator.pushReplacementNamed(context, '/ejercicio10_contador');
       },
     ),
+    ListTile(
+      leading: const Icon(Icons.camera_alt),
+      title: const Text('Instagram'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/ejercicio11_instagram');
+      },
+    ),
+
     ListTile(
       leading: const Icon(Icons.color_lens),
       title: const Text('Colores Aleatorios'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/colores_aleatorios');
+        Navigator.pushReplacementNamed(
+          context,
+          '/ejercicio12_colores_aleatorios',
+        );
       },
     ),
     ListTile(
       leading: const Icon(Icons.gamepad),
       title: const Text('Juego'),
       onTap: () {
-        Navigator.pushReplacementNamed(context, '/juego');
+        Navigator.pushReplacementNamed(context, '/ejercicio13_juego');
       },
     ),
   ],

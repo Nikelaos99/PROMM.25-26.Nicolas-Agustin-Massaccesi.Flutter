@@ -2,8 +2,10 @@
 import 'package:proyecto/screens/screens.dart';
 
 // Widget que muestra una serie de imágenes organizadas verticalmente en una columna
-class FotosEnColumna extends StatelessWidget {
-  const FotosEnColumna({super.key}); // Constructor constante con clave opcional
+class FotosEnColumna2 extends StatelessWidget {
+  const FotosEnColumna2({
+    super.key,
+  }); // Constructor constante con clave opcional
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -11,7 +13,7 @@ class FotosEnColumna extends StatelessWidget {
     drawer: const NavegacionDrawer(),
 
     // AppBar superior con título fijo
-    appBar: AppBar(title: const Text('Fotos en Columna')),
+    appBar: AppBar(title: const Text('Fotos en Columna 2')),
 
     // Cuerpo centrado vertical y horizontalmente
     body: Center(

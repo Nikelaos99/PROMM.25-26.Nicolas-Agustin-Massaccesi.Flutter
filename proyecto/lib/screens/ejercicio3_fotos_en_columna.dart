@@ -2,8 +2,8 @@
 import 'package:proyecto/screens/screens.dart';
 
 // Widget que muestra una fila de imágenes horizontales
-class FotosEnFila extends StatelessWidget {
-  const FotosEnFila({super.key}); // Constructor constante con clave opcional
+class FotosEnColumna extends StatelessWidget {
+  const FotosEnColumna({super.key}); // Constructor constante con clave opcional
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -11,13 +11,13 @@ class FotosEnFila extends StatelessWidget {
     drawer: const NavegacionDrawer(),
 
     // AppBar superior con título fijo
-    appBar: AppBar(title: const Text('Fotos en Fila')),
+    appBar: AppBar(title: const Text('Fotos en Columna')),
 
-    // Cuerpo centrado vertical y horizontalmente
+    // Cuerpo centrado
     body: Center(
-      child: Row(
+      child: Column(
         mainAxisAlignment:
-            MainAxisAlignment.center, // Centra la fila horizontalmente
+            MainAxisAlignment.center, // Centra la columna verticalmente
         children: [
           // Imagen 1 desde Picsum con tamaño fijo
           Image.network(
