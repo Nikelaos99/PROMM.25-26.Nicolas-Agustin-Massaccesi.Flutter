@@ -14,10 +14,18 @@ class InstagramBottomState extends State<InstagramBottom> {
 
   @override
   Widget build(BuildContext context) {
+    // Colores dinámicos según el tema actual
+    final Color textoColor =
+        Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+    final Color iconoColor = Theme.of(context).iconTheme.color ?? Colors.black;
+    final Color bordeColor = Theme.of(
+      context,
+    ).dividerColor; // color adaptado para bordes
+
     return SingleChildScrollView(
       child: Column(
         children: [
-          // 🟣 Historias destacadas (scroll horizontal)
+          // Historias destacadas (scroll horizontal)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: SizedBox(
@@ -28,30 +36,44 @@ class InstagramBottomState extends State<InstagramBottom> {
                   construirElementoHistoria(
                     'assets/images/instagram/nuevo.jpg',
                     'Nuevo',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/pilotando.jpg',
                     'Pilotando',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/francia.jpg',
                     'Francia',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/arquitectura.jpg',
                     'Arquitectura',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/retrato.jpg',
                     'Retratos',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/comida.jpg',
                     'Comida',
+                    textoColor,
+                    bordeColor,
                   ),
                   construirElementoHistoria(
                     'assets/images/instagram/coche.jpg',
                     'Coches',
+                    textoColor,
+                    bordeColor,
                   ),
                 ],
               ),
@@ -60,19 +82,27 @@ class InstagramBottomState extends State<InstagramBottom> {
 
           const SizedBox(height: 12),
 
-          // 🟦 Sección de pestañas (grid y perfil etiquetado)
+          // Sección de pestañas (grid y perfil etiquetado)
           DefaultTabController(
             length: 2,
             child: Column(
               children: [
                 // Selector de pestañas
                 TabBar(
-                  tabs: const [
+                  tabs: [
                     Tab(
-                      icon: Icon(Icons.grid_on_rounded, size: 30),
+                      icon: Icon(
+                        Icons.grid_on_rounded,
+                        size: 30,
+                        color: iconoColor,
+                      ),
                     ), // Vista de cuadrícula
                     Tab(
-                      icon: Icon(Icons.person_pin_sharp, size: 30),
+                      icon: Icon(
+                        Icons.person_pin_sharp,
+                        size: 30,
+                        color: iconoColor,
+                      ),
                     ), // Vista de perfil etiquetado
                   ],
                   onTap: (index) {
@@ -88,7 +118,7 @@ class InstagramBottomState extends State<InstagramBottom> {
                   height: 220,
                   child: TabBarView(
                     children: [
-                      // 🖼️ Vista en cuadrícula con 9 imágenes
+                      // Vista en cuadrícula con 9 imágenes
                       GridView.count(
                         mainAxisSpacing: 2,
                         crossAxisSpacing: 2,
@@ -101,7 +131,7 @@ class InstagramBottomState extends State<InstagramBottom> {
                         }),
                       ),
 
-                      // 🧘 Vista alternativa con una imagen destacada
+                      // Vista alternativa con una imagen destacada
                       Center(
                         child: Container(
                           decoration: BoxDecoration(
@@ -122,14 +152,14 @@ class InstagramBottomState extends State<InstagramBottom> {
             ),
           ),
 
-          // ⚫ Barra de navegación inferior estilo Instagram
+          // Barra de navegación inferior estilo Instagram
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const Icon(Icons.home_rounded, size: 40),
-              const Icon(Icons.search_rounded, size: 40),
-              const Icon(Icons.add_circle, size: 40),
-              const Icon(Icons.favorite_rounded, size: 40),
+              Icon(Icons.home_rounded, size: 40, color: iconoColor),
+              Icon(Icons.search_rounded, size: 40, color: iconoColor),
+              Icon(Icons.add_circle, size: 40, color: iconoColor),
+              Icon(Icons.favorite_rounded, size: 40, color: iconoColor),
 
               // Foto de perfil como ícono final
               Container(
@@ -150,8 +180,13 @@ class InstagramBottomState extends State<InstagramBottom> {
     );
   }
 
-  // 🔁 Método auxiliar para construir cada historia destacada
-  Widget construirElementoHistoria(String rutaImagen, String etiqueta) {
+  // Método auxiliar para construir cada historia destacada
+  Widget construirElementoHistoria(
+    String rutaImagen,
+    String etiqueta,
+    Color textoColor,
+    Color bordeColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Column(
@@ -165,10 +200,13 @@ class InstagramBottomState extends State<InstagramBottom> {
                 image: AssetImage(rutaImagen),
                 fit: BoxFit.cover,
               ),
-              border: Border.all(color: Colors.black, width: 1),
+              border: Border.all(color: bordeColor, width: 1), // borde dinámico
             ),
           ),
-          Text(etiqueta, style: const TextStyle(fontSize: 13)),
+          Text(
+            etiqueta,
+            style: TextStyle(fontSize: 13, color: textoColor), // texto dinámico
+          ),
         ],
       ),
     );

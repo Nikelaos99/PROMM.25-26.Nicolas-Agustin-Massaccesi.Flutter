@@ -25,15 +25,14 @@ class FotosEnColumna extends StatelessWidget {
             width: 100,
             height: 100,
           ),
-          const SizedBox(width: 10), // Espaciado horizontal entre imágenes
+          const SizedBox(height: 10), // Espaciado entre imágenes
           // Imagen 2
           Image.network(
             'https://picsum.photos/100?image=20',
             width: 100,
             height: 100,
           ),
-          const SizedBox(width: 10),
-
+          const SizedBox(height: 10), // Espaciado entre imágenes
           // Imagen 3
           Image.network(
             'https://picsum.photos/100?image=30',

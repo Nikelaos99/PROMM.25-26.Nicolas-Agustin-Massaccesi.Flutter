@@ -2,6 +2,7 @@
 // Cada archivo representa una pantalla o componente visual que se puede navegar
 
 export "../drawer/navegacion_drawer.dart"; // Drawer lateral para navegación entre secciones
+export 'splash_screen.dart'; // Splash screen que tras 3 segundos se cambia por la pantalla de inicia
 export "ejercicio1_home_screen.dart"; // Pantalla principal o de inicio
 export "ejercicio2_imagen_representativa.dart"; // Muestra una imagen que me representa y mi nombre
 export "ejercicio3_fotos_en_columna.dart"; // Muestra imágenes organizadas en una fila
@@ -15,6 +16,9 @@ export "ejercicio10_contador.dart"; // Pantalla con contador
 export "ejercicio11_instagram.dart"; // Simulación o diseño inspirado en Instagram
 export "ejercicio12_colores_aleatorios.dart"; // Colores aleatorios revisado
 export "ejercicio13_juego.dart"; // Pantalla con juego de hacer clic en imagenes
+export 'ejercicio14_tema_oscuro.dart'; // Pantalla con switch para activar/desactivar el modo oscuro
+export 'ejercicio15_formulario.dart'; // Pantalla con mi primer formulario
+export 'ejercicio16_formulario2.dart'; // Pantalla con mi segundo formulario
 
 // 🛠️ Utilidades y configuración global
 

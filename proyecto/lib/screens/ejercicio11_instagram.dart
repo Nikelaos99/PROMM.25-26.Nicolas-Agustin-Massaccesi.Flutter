@@ -11,33 +11,44 @@ class Instagram extends StatelessWidget {
   const Instagram({super.key}); // Constructor constante con clave opcional
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    // Drawer lateral ubicado a la derecha (como en Instagram)
-    endDrawer: const NavegacionDrawer(),
+  Widget build(BuildContext context) {
+    // Obtenemos colores dinámicos según el tema actual
+    final Color fondo = Theme.of(context).scaffoldBackgroundColor;
+    final Color texto =
+        Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+    final Color iconos = Theme.of(context).iconTheme.color ?? Colors.black;
 
-    // Fondo blanco para mantener el estilo visual de Instagram
-    backgroundColor: Colors.white,
+    return Scaffold(
+      // Drawer lateral ubicado a la derecha (como en Instagram)
+      endDrawer: const NavegacionDrawer(),
 
-    // AppBar superior con estilo minimalista
-    appBar: AppBar(
-      backgroundColor: Colors.white, // Fondo blanco como en Instagram
-      iconTheme: IconThemeData(color: Colors.black), // Íconos en negro
-      // Título con nombre de usuario y flecha desplegable
-      title: const Row(
+      // Fondo dinámico según el tema
+      backgroundColor: fondo,
+
+      // AppBar superior con estilo minimalista
+      appBar: AppBar(
+        backgroundColor: fondo, // 👈 usa el mismo color que el Scaffold
+        iconTheme: IconThemeData(color: iconos), // Íconos adaptados al tema
+        // Título con nombre de usuario y flecha desplegable
+        title: Row(
+          children: [
+            Text(
+              'gatogatonson',
+              style: TextStyle(color: texto, fontWeight: FontWeight.bold),
+            ),
+            Icon(Icons.keyboard_arrow_down_rounded, color: iconos),
+          ],
+        ),
+      ),
+
+      // Cuerpo dividido en tres secciones verticales
+      body: const Column(
         children: [
-          Text('gatogatonson', style: TextStyle(color: Colors.black)),
-          Icon(Icons.keyboard_arrow_down_rounded),
+          InstagramTop(), // Parte superior: perfil, historia, etc.
+          InstagramMiddle(), // Parte media: imagen o contenido principal
+          InstagramBottom(), // Parte inferior: botones de interacción
         ],
       ),
-    ),
-
-    // Cuerpo dividido en tres secciones verticales
-    body: const Column(
-      children: [
-        InstagramTop(), // Parte superior: perfil, historia, etc.
-        InstagramMiddle(), // Parte media: imagen o contenido principal
-        InstagramBottom(), // Parte inferior: botones de interacción
-      ],
-    ),
-  );
+    );
+  }
 }

@@ -22,7 +22,7 @@ class ImagenRepresentativa extends StatelessWidget {
             const SizedBox(height: 40),
             Text(
               'Nicolás Agustín Massaccesi',
-              style: GoogleFonts.cookie(fontSize: 48, color: Colors.black),
+              style: GoogleFonts.cookie(fontSize: 48),
               textAlign: TextAlign.center,
             ),
           ],

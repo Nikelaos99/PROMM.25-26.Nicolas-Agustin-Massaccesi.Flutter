@@ -7,6 +7,10 @@ class InstagramTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🎨 Obtenemos el color de texto según el tema actual
+    final Color textoColor =
+        Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
+
     return Padding(
       padding: const EdgeInsets.all(12.0), // Espaciado alrededor del contenido
       child: Row(
@@ -36,35 +40,47 @@ class InstagramTop extends StatelessWidget {
           ),
 
           // 📊 Estadísticas: Publicaciones
-          const Column(
+          Column(
             children: [
               Text(
                 "1.026",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: textoColor, // 👈 color dinámico
+                ),
               ),
-              Text("Publicaciones"),
+              Text("Publicaciones", style: TextStyle(color: textoColor)),
             ],
           ),
 
           // 📊 Estadísticas: Seguidores
-          const Column(
+          Column(
             children: [
               Text(
                 "666",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: textoColor,
+                ),
               ),
-              Text("Seguidores"),
+              Text("Seguidores", style: TextStyle(color: textoColor)),
             ],
           ),
 
           // 📊 Estadísticas: Seguidos
-          const Column(
+          Column(
             children: [
               Text(
                 "211",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: textoColor,
+                ),
               ),
-              Text("Seguidos"),
+              Text("Seguidos", style: TextStyle(color: textoColor)),
             ],
           ),
         ],

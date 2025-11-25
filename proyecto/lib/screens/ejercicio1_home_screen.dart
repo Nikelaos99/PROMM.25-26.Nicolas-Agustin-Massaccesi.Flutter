@@ -23,14 +23,11 @@ class HomePage extends StatelessWidget {
             MainAxisAlignment.center, // Centra los elementos verticalmente
         children: [
           // Nombre estilizado con fuente Lobster
-          Text(
-            'Nicolás Massaccesi',
-            style: GoogleFonts.lobster(fontSize: 32, color: Colors.black),
-          ),
+          Text('Nicolás Massaccesi', style: GoogleFonts.lobster(fontSize: 32)),
           // Enlace al repositorio de GitHub con fuente Roboto
           Text(
             'https://github.com/Nikelaos99/PROMM.25-26.Nicolas-Agustin-Massaccesi.Flutter',
-            style: GoogleFonts.roboto(fontSize: 24, color: Colors.black),
+            style: GoogleFonts.roboto(fontSize: 24),
             textAlign: TextAlign.center, // Centra el texto horizontalmente
           ),
         ],
