@@ -27,7 +27,7 @@ class Instagram extends StatelessWidget {
 
       // AppBar superior con estilo minimalista
       appBar: AppBar(
-        backgroundColor: fondo, // 👈 usa el mismo color que el Scaffold
+        backgroundColor: fondo, // Usa el mismo color que el Scaffold
         iconTheme: IconThemeData(color: iconos), // Íconos adaptados al tema
         // Título con nombre de usuario y flecha desplegable
         title: Row(

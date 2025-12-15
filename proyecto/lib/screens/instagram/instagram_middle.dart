@@ -43,9 +43,10 @@ class InstagramMiddle extends StatelessWidget {
                   const SizedBox(height: 4), // Espaciado entre líneas
                   // Biografía o frase personal
                   Text(
-                    "\"¡Miau, miau, ronroneo!.\"",
+                    "¡Miau, miau, ronroneo! 🐾",
                     style: TextStyle(color: textoColor),
                   ),
+
                   const SizedBox(height: 4),
 
                   // Enlace externo estilizado en azul y subrayado
@@ -62,6 +63,32 @@ class InstagramMiddle extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Followed by ", // texto normal
+                          style: TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                        TextSpan(
+                          text:
+                              "sara, padiya, nicomassaccesi ", // 👈 solo esta palabra en negrita
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: "and ",
+                          style: TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                        TextSpan(
+                          text:
+                              "\n22 others", // 👈 solo esta palabra en negrita
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
                 ],
               ),
             ],
@@ -69,18 +96,78 @@ class InstagramMiddle extends StatelessWidget {
         ),
 
         const SizedBox(height: 8), // Espaciado entre secciones
-        // Botón para editar el perfil
-        ElevatedButton(
-          onPressed: () {}, // Acción al presionar (vacía por ahora)
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 80,
-              vertical: 12,
-            ), // Tamaño del botón
-          ),
-          child: const Text("Editar perfil"),
-        ),
+        // Fila de botones de acción estilo Instagram
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Botón Following con flecha
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text("Following"),
+                  SizedBox(width: 4),
+                  Icon(Icons.keyboard_arrow_down_rounded),
+                ],
+              ),
+            ),
 
+            // Botón Message
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              child: const Text("Message"),
+            ),
+
+            // Botón Email
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              child: const Text("Email"),
+            ),
+
+            // Botón solo con flecha hacia abajo
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              child: const Icon(Icons.keyboard_arrow_down_rounded),
+            ),
+          ],
+        ),
         const SizedBox(height: 12), // Espaciado final
       ],
     );

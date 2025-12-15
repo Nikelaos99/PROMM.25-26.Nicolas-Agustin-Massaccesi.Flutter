@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:proyecto/screens/screens.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Clase principal del juego
 class Juego extends StatelessWidget {
   const Juego({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return JuegoAux();
+    return const JuegoAux();
   }
 }
 
-// Widget con estado que controla el juego
 class JuegoAux extends StatefulWidget {
   const JuegoAux({super.key});
 
@@ -21,13 +20,12 @@ class JuegoAux extends StatefulWidget {
 }
 
 class _JuegoState extends State<JuegoAux> {
-  int _puntos = 0; // Puntuación del jugador
-  Random _random = Random(); // Generador de números aleatorios
-  Offset _posicionImagen = Offset.zero; // Posición de la imagen en pantalla
-  Timer? _timer; // Temporizador para controlar el tiempo
-  int _tiempoRestante =
-      3; // Tiempo restante en segundos para hacer clic en la imagen
-  late String _imagenUrl; // URL de la imagen actual
+  int _puntos = 0;
+  Random _random = Random();
+  Offset _posicionImagen = Offset.zero;
+  Timer? _timer;
+  int _tiempoRestante = 3;
+  late String _imagenUrl;
   List<String> _mensajesPuntosPerdidos = [
     'Oh no!',
     'Ánimo!',
@@ -39,23 +37,38 @@ class _JuegoState extends State<JuegoAux> {
   @override
   void initState() {
     super.initState();
-    _imagenUrl = _generarUrlImagen(); // Inicializa la URL de la imagen
-    _iniciarJuego(); // Inicia el juego
+    _imagenUrl = _generarUrlImagen();
+    _cargarPuntos(); // Cargar puntuación guardada
+    _iniciarJuego();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _moverImagen(); // Mueve la imagen a una nueva posición
+    _moverImagen();
   }
 
-  // Configura e inicia el temporizador del juego
+  // Guardar puntuación en SharedPreferences
+  Future<void> _guardarPuntos() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('puntos', _puntos);
+  }
+
+  // Cargar puntuación desde SharedPreferences
+  Future<void> _cargarPuntos() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _puntos = prefs.getInt('puntos') ?? 0; // Si no existe, arranca en 0
+    });
+  }
+
   void _iniciarJuego() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _tiempoRestante -= 1;
         if (_tiempoRestante <= 0) {
-          _puntos -= 2; // Resta puntos si no se hace clic a tiempo
+          _puntos -= 2;
+          _guardarPuntos(); // Guardar cada vez que cambie
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -67,23 +80,21 @@ class _JuegoState extends State<JuegoAux> {
                 ),
               ),
             ),
-          ); // Imprime un mensaje aleatorio de los mensajes de perdida de puntos.
+          );
 
-          _moverImagen(); // Mueve la imagen
-          _tiempoRestante = 3; // Restablece el tiempo
+          _moverImagen();
+          _tiempoRestante = 3;
         }
       });
     });
   }
 
-  // Genera una nueva posición aleatoria para la imagen
   void _moverImagen() {
     setState(() {
       double screenWidth = MediaQuery.of(context).size.width;
       double screenHeight = MediaQuery.of(context).size.height;
       double offsetX, offsetY;
 
-      // Evita el área del texto "Puntos" y "Tiempo", y los bordes de pantalla
       do {
         offsetX = _random.nextDouble() * (screenWidth - 100);
         offsetY = _random.nextDouble() * (screenHeight - 150);
@@ -92,115 +103,69 @@ class _JuegoState extends State<JuegoAux> {
           (offsetX > screenWidth - 100) ||
           (offsetY > screenHeight - 100));
 
-      _posicionImagen = Offset(
-        offsetX,
-        offsetY,
-      ); // Actualiza la posición de la imagen
-      _imagenUrl = _generarUrlImagen(); // Genera una nueva URL para la imagen
+      _posicionImagen = Offset(offsetX, offsetY);
+      _imagenUrl = _generarUrlImagen();
     });
   }
 
-  // Genera una URL aleatoria para la imagen desde picsum.photos
   String _generarUrlImagen() {
     return 'https://picsum.photos/seed/${_random.nextInt(1000)}/100';
   }
 
-  // Maneja el evento de hacer clic en la imagen
   void _imagenPulsada() {
     setState(() {
-      _puntos += 1; // Suma un punto al puntaje
-      _moverImagen(); // Mueve la imagen a una nueva posición
-      _tiempoRestante = 3; // Restablece el tiempo
+      _puntos += 1;
+      _guardarPuntos(); // Guardar cada vez que sume puntos
+      _moverImagen();
+      _tiempoRestante = 3;
+
       switch (_puntos) {
         case 5:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Bravo! Has alcanzado 5 puntos. Estás en el camino correcto, sigue así. 🌟',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Bravo! Has alcanzado 5 puntos 🌟');
           break;
         case 20:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Impresionante! Has llegado a 20 puntos. Cada vez te acercas más a tu objetivo. ¡Sigue adelante! 🚀',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Impresionante! 20 puntos 🚀');
           break;
         case 50:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Increíble! Has alcanzado 50 puntos. Estás demostrando una gran habilidad y determinación. ¡No pares ahora! 🏅',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Increíble! 50 puntos 🏅');
           break;
         case 100:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Felicidades! 100 puntos alcanzados. Este es un logro significativo y muestra tu dedicación y esfuerzo. ¡Eres imparable! 💯',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Felicidades! 100 puntos 💯');
           break;
         case 500:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Impresionante! Has alcanzado 500 puntos. Tu dedicación y habilidades te están llevando muy lejos. ¡Sigue así, campeón! 🏆🌟',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Impresionante! 500 puntos 🏆🌟');
           break;
         case 1000:
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Center(
-                child: Text(
-                  '¡Asombroso! Has llegado a 1000 puntos. Este es un logro excepcional y demuestra tu talento y perseverancia. ¡Eres una leyenda! 🌟🏆',
-                ),
-              ),
-            ),
-          );
+          _mostrarMensaje('¡Asombroso! 1000 puntos 🌟🏆');
           break;
       }
     });
   }
 
+  void _mostrarMensaje(String mensaje) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Center(child: Text(mensaje))));
+  }
+
   @override
   void dispose() {
-    _timer?.cancel(); // Cancela el temporizador cuando el widget se elimina
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: NavegacionDrawer(), // Menú de navegación
+      drawer: const NavegacionDrawer(),
       appBar: AppBar(
-        title: Text('Juego de Imágenes'),
+        title: const Text('Juego de Imágenes'),
         backgroundColor: Colors.red,
       ),
       body: Stack(
         children: [
-          // Fondo con un diseño bonito (degradado)
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.white, Colors.redAccent],
                 begin: Alignment.topLeft,
@@ -208,7 +173,6 @@ class _JuegoState extends State<JuegoAux> {
               ),
             ),
           ),
-          // Imagen en posición aleatoria
           Positioned(
             left: _posicionImagen.dx,
             top: _posicionImagen.dy,
@@ -217,14 +181,13 @@ class _JuegoState extends State<JuegoAux> {
               child: Image.network(_imagenUrl, width: 100, height: 100),
             ),
           ),
-          // Muestra la puntuación del jugador
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 'Puntos: $_puntos',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -232,14 +195,13 @@ class _JuegoState extends State<JuegoAux> {
               ),
             ),
           ),
-          // Muestra el tiempo restante
           Align(
             alignment: Alignment.topRight,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
                 'Tiempo: $_tiempoRestante',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,

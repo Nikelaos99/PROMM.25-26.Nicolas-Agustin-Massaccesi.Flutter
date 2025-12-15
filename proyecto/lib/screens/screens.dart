@@ -1,4 +1,4 @@
-// 📱 Pantallas principales de la app
+// Pantallas principales de la app
 // Cada archivo representa una pantalla o componente visual que se puede navegar
 
 export "../drawer/navegacion_drawer.dart"; // Drawer lateral para navegación entre secciones
@@ -20,7 +20,7 @@ export 'ejercicio14_tema_oscuro.dart'; // Pantalla con switch para activar/desac
 export 'ejercicio15_formulario.dart'; // Pantalla con mi primer formulario
 export 'ejercicio16_formulario2.dart'; // Pantalla con mi segundo formulario
 
-// 🛠️ Utilidades y configuración global
+// Utilidades y configuración global
 
 export "package:flutter/material.dart"; // Importa todo el framework de Material Design
 export "package:proyecto/routes/app_routes.dart"; // Archivo con las rutas definidas para navegación

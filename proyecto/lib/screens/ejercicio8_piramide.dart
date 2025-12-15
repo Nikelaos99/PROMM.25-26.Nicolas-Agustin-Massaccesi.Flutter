@@ -39,7 +39,7 @@ class Piramide extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // 🟦 Nivel superior: 1 imagen
+              // Nivel superior: 1 imagen
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -56,7 +56,7 @@ class Piramide extends StatelessWidget {
                 ],
               ),
 
-              // 🟨 Segundo nivel: 2 imágenes
+              // Segundo nivel: 2 imágenes
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -84,7 +84,7 @@ class Piramide extends StatelessWidget {
                 ],
               ),
 
-              // 🟥 Tercer nivel: 3 imágenes
+              // Tercer nivel: 3 imágenes
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

@@ -22,7 +22,7 @@ class Textos extends StatelessWidget {
     // Cuerpo principal con tres bloques verticales
     body: Column(
       children: [
-        // 🟨 Primer recuadro: texto con fuente Georgia y overflow ellipsis
+        // Primer recuadro: texto con fuente Georgia y overflow ellipsis
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(16), // Espaciado interno
@@ -41,7 +41,7 @@ class Textos extends StatelessWidget {
           ),
         ),
 
-        // 🟦 Segundo recuadro: texto con fuente Roboto y AutoSizeText
+        // Segundo recuadro: texto con fuente Roboto y AutoSizeText
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -60,7 +60,7 @@ class Textos extends StatelessWidget {
           ),
         ),
 
-        // 🟩 Tercer recuadro: texto con fuente Lobster desde Google Fonts y overflow fade
+        // Tercer recuadro: texto con fuente Lobster desde Google Fonts y overflow fade
         Expanded(
           child: Container(
             padding: const EdgeInsets.all(16),

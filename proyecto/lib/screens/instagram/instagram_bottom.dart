@@ -84,7 +84,7 @@ class InstagramBottomState extends State<InstagramBottom> {
 
           // Sección de pestañas (grid y perfil etiquetado)
           DefaultTabController(
-            length: 2,
+            length: 4,
             child: Column(
               children: [
                 // Selector de pestañas
@@ -104,6 +104,20 @@ class InstagramBottomState extends State<InstagramBottom> {
                         color: iconoColor,
                       ),
                     ), // Vista de perfil etiquetado
+                    Tab(
+                      icon: Icon(
+                        Icons.live_tv_rounded,
+                        size: 30,
+                        color: iconoColor,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.shopping_bag_outlined,
+                        size: 30,
+                        color: iconoColor,
+                      ),
+                    ),
                   ],
                   onTap: (index) {
                     setState(() {
@@ -131,6 +145,34 @@ class InstagramBottomState extends State<InstagramBottom> {
                         }),
                       ),
 
+                      // Vista alternativa con una imagen destacada
+                      Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                'assets/images/instagram/relax.jpg',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Vista alternativa con una imagen destacada
+                      Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            image: const DecorationImage(
+                              image: AssetImage(
+                                'assets/images/instagram/relax.jpg',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
                       // Vista alternativa con una imagen destacada
                       Center(
                         child: Container(

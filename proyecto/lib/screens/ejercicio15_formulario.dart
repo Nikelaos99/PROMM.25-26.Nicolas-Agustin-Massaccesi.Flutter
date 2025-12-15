@@ -50,7 +50,7 @@ class _FormularioRegistroEventoState extends State<FormularioRegistroEvento> {
 
   @override
   Widget build(BuildContext context) {
-    // 🎨 Colores dinámicos según el tema
+    // Colores dinámicos según el tema
     final Color textoColor =
         Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black;
 
