@@ -1,0 +1,24 @@
+[
+    {
+        "barcode": "8410010218125",
+        "name": "Leche Entera Pascual",
+        "brand": "Pascual",
+        "imageUrl": "https://es.openfoodfacts.org/images/products/841/001/021/8125/front_es.33.400.jpg",
+        "dateAdded": "2026-02-11T10:00:00Z",
+        "quantity": 6,
+        "category": "Lácteos",
+        "expiryDate": "2026-08-15T00:00:00Z",
+        "notes": "Comprado en pack de 6"
+    },
+    {
+        "barcode": "7613034626844",
+        "name": "Tomate Frito Solís",
+        "brand": "Solís",
+        "imageUrl": "https://es.openfoodfacts.org/images/products/761/303/462/6844/front_es.45.400.jpg",
+        "dateAdded": "2026-02-11T11:30:00Z",
+        "quantity": 3,
+        "category": "Conservas",
+        "expiryDate": "2027-12-01T00:00:00Z",
+        "notes": "Sin conservantes"
+    }
+]

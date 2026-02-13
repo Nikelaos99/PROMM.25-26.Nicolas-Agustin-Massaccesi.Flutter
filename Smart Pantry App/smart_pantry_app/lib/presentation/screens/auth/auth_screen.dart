@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/colors.dart';
-import '../../widgets/auth/login_form.dart';
-import '../../widgets/auth/register_form.dart';
+import 'widgets/login_form.dart';
+import 'widgets/register_form.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -23,26 +23,29 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              // Logo y Título
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
+                  color: AppColors.primaryGreen, // FONDO VERDE
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.shopping_bag_outlined,
-                  color: Colors.white,
-                  size: 50,
-                ),
+                child: Image.asset('assets/images/icon_pantry.png', height: 50),
               ),
+
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 "Smart Pantry App",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF004D40),
+                  color: AppColors.primaryGreen,
                 ),
               ),
               const Text(
@@ -57,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 10,
@@ -67,7 +70,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Selector de Pestañas (Custom Tab)
+                    // Selector de Pestañas
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[100],

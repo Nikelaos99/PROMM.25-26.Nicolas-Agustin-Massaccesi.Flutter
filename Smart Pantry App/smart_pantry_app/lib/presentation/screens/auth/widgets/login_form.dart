@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/colors.dart';
-import '../../../data/services/auth_service.dart';
-import '../custom_input.dart';
+import '../../../../core/constants/colors.dart';
+import '../../../../data/services/auth_service.dart';
+import '../../../widgets/custom_input.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -18,8 +18,16 @@ class _LoginFormState extends State<LoginForm> {
   bool showError = false;
   bool isLoading = false;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _handleLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.isEmpty) {
       setState(() => showError = true);
       return;
     }
@@ -31,17 +39,12 @@ class _LoginFormState extends State<LoginForm> {
 
     final user = await _authService.loginWithEmail(
       _emailController.text.trim(),
-      _passwordController.text.trim(),
+      _passwordController.text,
     );
 
     if (mounted) {
       setState(() => isLoading = false);
-      if (user != null) {
-        // Inicio de sesión exitoso
-        print("Sesión iniciada: ${user.email}");
-      } else {
-        setState(() => showError = true);
-      }
+      if (user == null) setState(() => showError = true);
     }
   }
 
@@ -62,79 +65,46 @@ class _LoginFormState extends State<LoginForm> {
           isPassword: true,
           controller: _passwordController,
         ),
-
         if (showError) _buildErrorBanner(),
-
         const SizedBox(height: 20),
-
         SizedBox(
           width: double.infinity,
           height: 55,
-          child: ElevatedButton.icon(
+          child: ElevatedButton(
             onPressed: isLoading ? null : _handleLogin,
-            icon: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.login, color: Colors.white),
-            label: Text(
-              isLoading ? "Entrando..." : "Iniciar Sesión",
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
             ),
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text(
+                    "Iniciar Sesión",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
           ),
         ),
-        const SizedBox(height: 20),
-        _buildNoteBox(),
       ],
     );
   }
 
   Widget _buildErrorBanner() {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
-        color: AppColors.errorRed,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.errorText.withOpacity(0.3)),
-      ),
-      child: const Text(
-        "Credenciales incorrectas o campos vacíos",
-        style: TextStyle(
-          color: AppColors.errorText,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNoteBox() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.infoBlue,
+        color: AppColors.errorRed.withOpacity(0.1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Text(
-        "Sincronización activa con Firebase habilitada.",
-        style: TextStyle(color: Colors.blue, fontSize: 12),
-        textAlign: TextAlign.center,
+        "Correo o contraseña incorrectos",
+        style: TextStyle(color: AppColors.errorText),
       ),
     );
   }

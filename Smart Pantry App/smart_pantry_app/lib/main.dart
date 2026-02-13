@@ -1,37 +1,92 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // <--- Añadido para los settings
 import 'package:hive_flutter/hive_flutter.dart';
-import 'presentation/screens/auth/auth_screen.dart';
+
+// Importaciones de tu proyecto
+import 'firebase_options.dart';
+import 'presentation/screens/auth/auth_wrapper.dart';
+import 'core/theme/app_theme.dart';
+import 'data/models/product_model.dart';
+import 'data/services/sync_service.dart';
 
 void main() async {
-  // 1. Asegurar que los bindings de Flutter estén listos
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Inicializar Firebase
-  // Nota: Requiere haber configurado el archivo google-services.json (Android)
-  // o GoogleService-Info.plist (iOS) vía FlutterFire CLI.
-  await Firebase.initializeApp();
+  // 1. Inicializar Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("🔥 Firebase inicializado correctamente");
 
-  // 3. Inicializar Hive para Flutter
+  // Configuración de persistencia de Firestore
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
+  print("📊 Firestore: Persistencia activada");
+
+  // 2. Inicializar Hive
   await Hive.initFlutter();
+  print("📦 Hive: Inicializado");
 
-  // 4. Abrir tu primera "caja" de datos para la despensa
-  await Hive.openBox('settings'); // Para configuraciones básicas
-  await Hive.openBox('products_box'); // Donde guardaremos el inventario
+  // 3. Registrar Adaptadores
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(ProductModelAdapter());
+    print("🛠️ Hive: Adaptador ProductModel registrado");
+  }
+
+  // 4. Abrir las cajas (Boxes)
+  await Hive.openBox('settings');
+  await Hive.openBox<ProductModel>('pantry_box');
+  print("📂 Hive: Cajas abiertas correctamente");
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final SyncService _syncService = SyncService();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    print("👀 App Observer: Registrado (Vigilando ciclo de vida)");
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // --- LÓGICA DE SINCRONIZACIÓN AUTOMÁTICA ---
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("📱 Estado de la App: $state");
+
+    if (state == AppLifecycleState.paused) {
+      print("📤 App en segundo plano: Iniciando sincronización de subida...");
+      _syncService.uploadPantryToCloud();
+    } else if (state == AppLifecycleState.resumed) {
+      print(
+        "📥 App en primer plano: Comprobando actualizaciones en la nube...",
+      );
+      _syncService.downloadPantryFromCloud();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smart Pantry App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.teal),
-      home: const AuthScreen(),
+      theme: AppTheme.lightTheme,
+      home: const AuthWrapper(),
     );
   }
 }
