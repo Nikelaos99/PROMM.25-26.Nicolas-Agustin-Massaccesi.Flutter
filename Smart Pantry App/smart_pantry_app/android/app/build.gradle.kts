@@ -21,23 +21,27 @@ android {
 
     defaultConfig {
         applicationId = "com.example.smart_pantry_app"
-        
-        // --- CAMBIO 1: minSdk a 21 ---
-        // Firestore requiere al menos 21 para funcionar bien sin configuraciones complejas
+        // Firestore y otras librerías modernas de Firebase necesitan minSdk 21
         minSdk = flutter.minSdkVersion 
-        
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // --- CAMBIO 2: Habilitar MultiDex ---
-        // Evita el error "limit of methods exceeded" al añadir Firebase
+        
         multiDexEnabled = true
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            // Usamos la configuración de debug para probar el APK rápido
             signingConfig = signingConfigs.getByName("debug")
+            
+            // --- SINTAXIS CORRECTA PARA KOTLIN (.kts) ---
+            applicationVariants.all {
+                outputs.all {
+                    val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                    output.outputFileName = "Smart_Pantry_App_v${defaultConfig.versionName}.apk"
+                }
+            }
         }
     }
 }

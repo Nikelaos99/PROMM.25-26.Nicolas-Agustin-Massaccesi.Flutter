@@ -27,12 +27,13 @@ class AlertSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: contentColor.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(icon, color: contentColor),
+              Icon(icon, color: contentColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -57,40 +58,55 @@ class AlertSection extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: p.imageUrl != null && p.imageUrl!.isNotEmpty
-                        ? Image.network(
-                            p.imageUrl!,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            // Se usan nombres distintos para evitar el error de duplicado
-                            errorBuilder: (context, error, stackTrace) =>
-                                _buildPlaceholder(),
-                          )
-                        : _buildPlaceholder(),
-                  ),
-                  title: Text(
-                    p.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Color(0xFF004D40),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: ListTile(
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: (p.imageUrl != null && p.imageUrl!.isNotEmpty)
+                          ? Image.network(
+                              p.imageUrl!,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                            )
+                          : _buildPlaceholder(),
                     ),
-                  ),
-                  subtitle: Text(
-                    "${p.category} | Cant: ${p.quantity}",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  trailing: Text(
-                    subtitleBuilder(p),
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: contentColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                    title: Text(
+                      p.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Color(0xFF004D40),
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Categoría: ${p.category} | Cantidad: ${p.quantity.toInt()}",
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          subtitleBuilder(p),
+                          style: TextStyle(
+                            color: contentColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                        if (p.expiryDate != null)
+                          Text(
+                            "${p.expiryDate!.day}/${p.expiryDate!.month}/${p.expiryDate!.year}",
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),

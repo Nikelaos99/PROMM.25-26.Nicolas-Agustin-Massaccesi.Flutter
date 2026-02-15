@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../../core/constants/colors.dart';
 import '../../../data/services/local_storage.dart';
 import '../../../data/providers/hive_provider.dart';
@@ -13,7 +10,7 @@ import '../add_product/add_product_manual_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../alerts/alerts_screen.dart';
 
-// Importación de tus widgets personalizados (YA EXISTENTES)
+// Importación de widgets personalizados
 import 'widgets/custom_app_bar.dart';
 import 'widgets/custom_bottom_nav.dart';
 import 'widgets/json_options_panel.dart';
@@ -28,80 +25,53 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _showJsonPanel = false;
+
+  // Instancias de servicios
   final LocalStorageService _storageService = LocalStorageService();
   final HiveProvider _hiveProvider = HiveProvider();
 
-  // Función para manejar la exportación
+  /// Maneja la exportación delegando al servicio de almacenamiento
   Future<void> _handleExport() async {
     try {
-      final jsonString = await _storageService.exportProductsToJson();
-      await Share.share(jsonString, subject: 'Backup Mi Despensa');
+      await _storageService.exportProductsToFile();
       setState(() => _showJsonPanel = false);
+      _showSnackBar("Exportación finalizada");
     } catch (e) {
       _showSnackBar("Error al exportar: $e", isError: true);
     }
   }
 
-  // Función para manejar la importación
-  Future<void> _handleImport() async {
+  /// Maneja la importación delegando al servicio y refrescando la UI
+  Future<void> _handleImport(bool replaceAll) async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+      final success = await _storageService.importProductsFromFile(
+        replaceAll: replaceAll,
       );
 
-      if (result != null) {
-        File file = File(result.files.single.path!);
-        String content = await file.readAsString();
-        if (!mounted) return;
-
-        _showImportDialog(content);
+      if (success) {
+        setState(() {
+          _showJsonPanel = false;
+          // Forzamos un rebuild para que las listas reflejen los nuevos datos
+        });
+        _showSnackBar(
+          replaceAll
+              ? "Inventario reemplazado con éxito"
+              : "Productos añadidos con éxito",
+        );
       }
     } catch (e) {
-      _showSnackBar("Error al importar: $e", isError: true);
+      _showSnackBar("Error en la importación: $e", isError: true);
     }
-  }
-
-  void _showImportDialog(String content) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Importar Inventario"),
-        content: const Text(
-          "¿Deseas añadir los productos o reemplazarlo todo?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => _executeImport(content, false),
-            child: const Text("AÑADIR"),
-          ),
-          TextButton(
-            onPressed: () => _executeImport(content, true),
-            child: const Text(
-              "REEMPLAZAR TODO",
-              style: TextStyle(color: AppColors.errorText),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _executeImport(String content, bool replaceAll) async {
-    await _storageService.importProductsFromJson(
-      content,
-      replaceAll: replaceAll,
-    );
-    if (mounted) Navigator.pop(context);
-    setState(() => _showJsonPanel = false);
-    _showSnackBar("Importación exitosa");
   }
 
   void _showSnackBar(String msg, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
+        behavior: SnackBarBehavior.floating,
         backgroundColor: isError ? AppColors.errorText : AppColors.primaryGreen,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(10),
       ),
     );
   }
@@ -113,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       extendBody: true,
 
-      // USANDO TU CUSTOM APP BAR
       appBar: CustomAppBar(
         onToggleJsonPanel: () =>
             setState(() => _showJsonPanel = !_showJsonPanel),
@@ -121,21 +90,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
       body: Column(
         children: [
+          // Panel de JSON dinámico
           if (_showJsonPanel)
             JsonOptionsPanel(
               productCount: _hiveProvider.getAllProducts().length,
               onExport: _handleExport,
-              onImport: _handleImport,
+              onImport: (replaceAll) => _handleImport(replaceAll),
             ),
+
           Expanded(
             child: IndexedStack(
               index: _currentIndex,
               children: [
                 const DashboardScreen(),
                 const ProductListScreen(),
-                ScannerScreen(
-                  isActive: _currentIndex == 2,
-                ), // Lógica de activación
+                // Se activa la cámara solo si el índice es 2
+                ScannerScreen(isActive: _currentIndex == 2),
                 const AlertsScreen(),
               ],
             ),
@@ -151,17 +121,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         backgroundColor: AppColors.primaryGreen,
+        elevation: 4,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, size: 32, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // USANDO TU CUSTOM BOTTOM NAV
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            // Cerramos el panel si cambiamos de pestaña para no estorbar
             _showJsonPanel = false;
           });
         },

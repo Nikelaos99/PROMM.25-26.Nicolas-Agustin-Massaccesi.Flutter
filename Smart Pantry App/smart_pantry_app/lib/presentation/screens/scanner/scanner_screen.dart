@@ -6,7 +6,7 @@ import '../../../data/models/product_model.dart';
 import '../../../core/constants/colors.dart';
 
 class ScannerScreen extends StatefulWidget {
-  final bool isActive; // Para saber si estamos en esta pestaña
+  final bool isActive;
 
   const ScannerScreen({super.key, required this.isActive});
 
@@ -18,8 +18,6 @@ class _ScannerScreenState extends State<ScannerScreen>
     with WidgetsBindingObserver {
   final FoodApiService _apiService = FoodApiService();
   final TextEditingController _manualCodeController = TextEditingController();
-
-  // Controlador con autoStart en false para que nosotros mandemos
   final MobileScannerController _scannerController = MobileScannerController(
     autoStart: false,
   );
@@ -31,14 +29,12 @@ class _ScannerScreenState extends State<ScannerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Si al cargar ya estamos en la pestaña, encendemos
     if (widget.isActive) _scannerController.start();
   }
 
   @override
   void didUpdateWidget(ScannerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si cambiamos de pestaña, encendemos o apagamos el hardware
     if (widget.isActive != oldWidget.isActive) {
       if (widget.isActive && !_showManualInput) {
         _scannerController.start();
@@ -66,14 +62,13 @@ class _ScannerScreenState extends State<ScannerScreen>
     }
   }
 
-  // --- LÓGICA DE DETECCIÓN ---
   void _onDetect(BarcodeCapture capture) async {
     if (_isProcessing || !widget.isActive) return;
     final List<Barcode> barcodes = capture.barcodes;
     if (barcodes.isNotEmpty) {
       final String code = barcodes.first.rawValue ?? "";
       if (code.isNotEmpty) {
-        _scannerController.stop(); // Pausamos cámara mientras procesa
+        _scannerController.stop();
         _searchAndConfirmProduct(code);
       }
     }
@@ -81,7 +76,6 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   Future<void> _searchAndConfirmProduct(String code) async {
     if (code.isEmpty) return;
-
     setState(() => _isProcessing = true);
     final productData = await _apiService.fetchProductByBarcode(code);
     setState(() => _isProcessing = false);
@@ -97,7 +91,6 @@ class _ScannerScreenState extends State<ScannerScreen>
     }
   }
 
-  // --- MODAL DE CONFIRMACIÓN CON DATEPICKER Y CANTIDAD ---
   void _showConfirmationModal(String code, Map<String, dynamic> data) {
     DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
     int quantity = 1;
@@ -137,13 +130,11 @@ class _ScannerScreenState extends State<ScannerScreen>
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF004D40),
+                      color: AppColors.textDark,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-
-                  // Selector de Cantidad
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -178,8 +169,6 @@ class _ScannerScreenState extends State<ScannerScreen>
                     ],
                   ),
                   const Divider(height: 32),
-
-                  // Selector de Fecha (DatePicker)
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(
@@ -206,14 +195,11 @@ class _ScannerScreenState extends State<ScannerScreen>
                           const Duration(days: 365 * 5),
                         ),
                       );
-                      if (picked != null) {
+                      if (picked != null)
                         setModalState(() => selectedDate = picked);
-                      }
                     },
                   ),
                   const SizedBox(height: 24),
-
-                  // Botón de Confirmación
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -227,10 +213,8 @@ class _ScannerScreenState extends State<ScannerScreen>
                       onPressed: () {
                         Navigator.pop(context);
                         _saveToHive(code, data, selectedDate, quantity);
-                        // Reiniciar cámara después de cerrar modal si seguimos en la pestaña
-                        if (widget.isActive && !_showManualInput) {
+                        if (widget.isActive && !_showManualInput)
                           _scannerController.start();
-                        }
                       },
                       child: const Text(
                         "Añadir a Despensa",
@@ -249,10 +233,7 @@ class _ScannerScreenState extends State<ScannerScreen>
         );
       },
     ).then((_) {
-      // Si cierran el modal sin guardar, también reintentamos encender cámara
-      if (widget.isActive && !_showManualInput) {
-        _scannerController.start();
-      }
+      if (widget.isActive && !_showManualInput) _scannerController.start();
     });
   }
 
@@ -270,7 +251,6 @@ class _ScannerScreenState extends State<ScannerScreen>
     );
   }
 
-  // --- GUARDADO EN HIVE ---
   void _saveToHive(
     String code,
     Map<String, dynamic> data,
@@ -279,34 +259,70 @@ class _ScannerScreenState extends State<ScannerScreen>
   ) async {
     final box = Hive.box<ProductModel>('pantry_box');
 
-    String rawCat = data['categories'] ?? "General";
-    String cleanCat = rawCat.split(',').first.split(':').last.trim();
-
-    final newProduct = ProductModel(
-      barcode: code,
-      name: data['product_name'] ?? "Desconocido",
-      brand: data['brands'],
-      imageUrl: data['image_url'],
-      dateAdded: DateTime.now(),
-      quantity: qty,
-      category: cleanCat.isEmpty ? "General" : cleanCat,
-      expiryDate: expiry,
+    // BUSCAR SI YA EXISTE (Mismo código Y misma fecha)
+    final existingIndex = box.values.toList().indexWhere(
+      (p) =>
+          p.barcode == code &&
+          p.expiryDate?.day == expiry.day &&
+          p.expiryDate?.month == expiry.month &&
+          p.expiryDate?.year == expiry.year,
     );
 
-    await box.add(newProduct);
-
-    if (mounted) {
-      _manualCodeController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppColors.primaryGreen,
-          content: Text("¡Producto guardado exitosamente!"),
-        ),
+    if (existingIndex != -1) {
+      final existingProduct = box.getAt(existingIndex)!;
+      final updatedProduct = ProductModel(
+        barcode: existingProduct.barcode,
+        name: existingProduct.name,
+        brand: existingProduct.brand,
+        imageUrl: existingProduct.imageUrl,
+        dateAdded: existingProduct.dateAdded,
+        quantity: existingProduct.quantity + qty, // SUMA
+        category: existingProduct.category,
+        expiryDate: existingProduct.expiryDate,
       );
+      await box.putAt(existingIndex, updatedProduct);
+      _showSuccess("¡Cantidad actualizada!");
+    } else {
+      // SI NO EXISTE, CREAR NUEVO
+      String rawCat = data['categories'] ?? "General";
+      String cleanCat = rawCat.split(',').first.split(':').last.trim();
+
+      final newProduct = ProductModel(
+        barcode: code,
+        name: data['product_name'] ?? "Desconocido",
+        brand: data['brands'],
+        imageUrl: data['image_url'],
+        dateAdded: DateTime.now(),
+        quantity: qty,
+        category: cleanCat.isEmpty ? "General" : cleanCat,
+        expiryDate: expiry,
+      );
+      await box.add(newProduct);
+      _showSuccess("¡Producto guardado!");
     }
+    _manualCodeController.clear();
   }
 
-  // --- INTERFAZ BASE ---
+  void _showSuccess(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.primaryGreen,
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.errorText,
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -315,7 +331,7 @@ class _ScannerScreenState extends State<ScannerScreen>
         title: Text(
           _showManualInput ? "Entrada Manual" : "Escanear Código",
           style: const TextStyle(
-            color: Color(0xFF004D40),
+            color: AppColors.textDark,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -369,7 +385,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 "Código de Barras",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF004D40),
+                  color: AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 12),
@@ -403,12 +419,12 @@ class _ScannerScreenState extends State<ScannerScreen>
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: Color(0xFF004D40),
+                color: AppColors.textDark,
               ),
             ),
             Text(
               "Escribe el código EAN/UPC",
-              style: TextStyle(color: Colors.grey, fontSize: 13),
+              style: TextStyle(color: AppColors.textGray, fontSize: 13),
             ),
           ],
         ),
@@ -454,19 +470,17 @@ class _ScannerScreenState extends State<ScannerScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.infoBlue,
+        color: AppColors.infoBlue.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Text(
         "• Ingresa el código numérico.\n• Verifica que los datos coincidan.\n• Selecciona la fecha de caducidad real.",
-        style: TextStyle(color: Color(0xFF1565C0), fontSize: 13, height: 1.5),
+        style: TextStyle(color: AppColors.infoBlue, fontSize: 13, height: 1.5),
       ),
     );
   }
 
   Widget _buildCameraView() {
-    if (!widget.isActive) return const SizedBox.shrink();
-
     return Stack(
       children: [
         MobileScanner(controller: _scannerController, onDetect: _onDetect),
@@ -495,12 +509,6 @@ class _ScannerScreenState extends State<ScannerScreen>
           ),
         ),
       ],
-    );
-  }
-
-  void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(backgroundColor: Colors.redAccent, content: Text(msg)),
     );
   }
 }

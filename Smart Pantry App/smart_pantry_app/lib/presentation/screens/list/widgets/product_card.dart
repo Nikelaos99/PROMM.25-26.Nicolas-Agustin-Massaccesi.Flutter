@@ -14,12 +14,11 @@ class ProductCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  // --- LÓGICA DE DATOS REALES ---
+  // --- LÓGICA DE FECHAS Y ESTADOS ---
 
   String _getExpiryText() {
     if (product.expiryDate == null) return "Sin fecha";
 
-    // Calculamos la diferencia real con el día de hoy
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final expiry = DateTime(
@@ -38,7 +37,9 @@ class ProductCard extends StatelessWidget {
 
   bool _isUrgent() {
     if (product.expiryDate == null) return false;
-    final difference = product.expiryDate!.difference(DateTime.now()).inDays;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final difference = product.expiryDate!.difference(today).inDays;
     return difference >= 0 && difference <= 3;
   }
 
@@ -48,26 +49,30 @@ class ProductCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 2,
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // IMAGEN DEL PRODUCTO (DINÁMICA)
+          // IMAGEN DEL PRODUCTO
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: Container(
               height: 160,
               width: double.infinity,
-              color: Colors
-                  .white, // Fondo blanco para que luzca como producto real
+              color: Colors.white,
               child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                   ? Image.network(
                       product.imageUrl!,
-                      fit: BoxFit
-                          .contain, // Muestra el producto completo sin recortar
+                      fit: BoxFit.contain,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primaryGreen,
+                            ),
+                          ),
                         );
                       },
                       errorBuilder: (_, __, ___) => _buildPlaceholder(),
@@ -81,23 +86,23 @@ class ProductCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // NOMBRE Y CANTIDAD
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
-                        product.name, // NOMBRE REAL
+                        product.name,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF004D40),
+                          color: AppColors.textDark,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // CANTIDAD REAL
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -117,24 +122,27 @@ class ProductCard extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // MARCA
                 Text(
-                  product.brand ?? "Marca genérica", // MARCA REAL
-                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                  product.brand ?? "Marca genérica",
+                  style: const TextStyle(
+                    color: AppColors.textGray,
+                    fontSize: 14,
+                  ),
                 ),
+
                 const SizedBox(height: 16),
 
-                // FILAS DE INFORMACIÓN
-                _buildInfoRow(
-                  "Categoría:",
-                  product.category ?? "General", // CATEGORÍA REAL
-                ),
+                // FILAS DE INFORMACIÓN (Categoría y Vencimiento)
+                _buildInfoRow("Categoría:", product.category ?? "General"),
                 _buildInfoRow(
                   "Vence:",
-                  _getExpiryText(), // FECHA REAL CALCULADA
+                  _getExpiryText(),
                   isUrgent: _isUrgent(),
                 ),
 
-                const Divider(height: 32),
+                const Divider(height: 32, thickness: 0.5),
 
                 // BOTONES DE ACCIÓN
                 Row(
@@ -145,8 +153,10 @@ class ProductCard extends StatelessWidget {
                         icon: const Icon(Icons.edit_outlined, size: 18),
                         label: const Text("Editar"),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.blue.shade700,
-                          side: BorderSide(color: Colors.blue.shade100),
+                          foregroundColor: AppColors.primaryGreen,
+                          side: BorderSide(
+                            color: AppColors.primaryGreen.withOpacity(0.3),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -161,8 +171,10 @@ class ProductCard extends StatelessWidget {
                         icon: const Icon(Icons.delete_outline, size: 18),
                         label: const Text("Eliminar"),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red.shade700,
-                          side: BorderSide(color: Colors.red.shade100),
+                          foregroundColor: AppColors.errorText,
+                          side: BorderSide(
+                            color: AppColors.errorText.withOpacity(0.3),
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -182,15 +194,15 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildPlaceholder() {
     return Container(
-      color: Colors.grey.shade100,
+      color: Colors.grey[50],
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inventory_2_outlined, size: 40, color: Colors.grey),
+          Icon(Icons.inventory_2_outlined, size: 40, color: AppColors.textGray),
           SizedBox(height: 8),
           Text(
             "Sin imagen",
-            style: TextStyle(color: Colors.grey, fontSize: 12),
+            style: TextStyle(color: AppColors.textGray, fontSize: 12),
           ),
         ],
       ),
@@ -206,7 +218,7 @@ class ProductCard extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.black87,
+              color: AppColors.textGray,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -214,13 +226,13 @@ class ProductCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEBEE),
+                color: AppColors.errorRed,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 value,
                 style: const TextStyle(
-                  color: Colors.red,
+                  color: AppColors.errorText,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -230,7 +242,7 @@ class ProductCard extends StatelessWidget {
             Text(
               value,
               style: const TextStyle(
-                color: Color(0xFF004D40),
+                color: AppColors.textDark,
                 fontWeight: FontWeight.w600,
               ),
             ),

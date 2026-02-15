@@ -3,7 +3,8 @@ import '../../../../core/constants/colors.dart';
 
 class JsonOptionsPanel extends StatelessWidget {
   final VoidCallback onExport;
-  final VoidCallback onImport;
+  // Cambiamos el onImport para que reciba el booleano de 'replaceAll'
+  final Function(bool) onImport;
   final int productCount;
 
   const JsonOptionsPanel({
@@ -19,14 +20,12 @@ class JsonOptionsPanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
       decoration: const BoxDecoration(
-        color:
-            AppColors.bgLight, // Fondo verde claro como en el área de usuario
+        color: AppColors.bgLight,
         border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Indicador visual de que es un panel desplegable
           Container(
             width: 40,
             height: 4,
@@ -36,7 +35,6 @@ class JsonOptionsPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          // Botón Exportar
           _buildButton(
             label: "Exportar a JSON",
             icon: Icons.upload_file_rounded,
@@ -44,12 +42,11 @@ class JsonOptionsPanel extends StatelessWidget {
             onTap: onExport,
           ),
           const SizedBox(height: 12),
-          // Botón Importar
           _buildButton(
             label: "Importar desde JSON",
             icon: Icons.file_download_outlined,
-            color: const Color(0xFF00BFA5), // El tono turquesa/verde agua
-            onTap: onImport,
+            color: const Color(0xFF00BFA5),
+            onTap: () => _showImportDialog(context),
           ),
           const SizedBox(height: 12),
           Row(
@@ -76,6 +73,42 @@ class JsonOptionsPanel extends StatelessWidget {
     );
   }
 
+  // Diálogo para elegir modo de importación
+  void _showImportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Importar Inventario"),
+        content: const Text(
+          "¿Deseas añadir los productos al inventario actual o reemplazar todo el contenido?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onImport(false); // Añadir
+            },
+            child: const Text("Añadir"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onImport(true); // Reemplazar
+            },
+            child: const Text(
+              "Reemplazar Todo",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildButton({
     required String label,
     required IconData icon,
@@ -84,7 +117,7 @@ class JsonOptionsPanel extends StatelessWidget {
   }) {
     return SizedBox(
       width: double.infinity,
-      height: 52, // Un poco más alto para mejor ergonomía táctil
+      height: 52,
       child: ElevatedButton.icon(
         onPressed: onTap,
         icon: Icon(icon, size: 22, color: Colors.white),
@@ -98,7 +131,7 @@ class JsonOptionsPanel extends StatelessWidget {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
-          elevation: 2, // Un toque de sombra para resaltar sobre el fondo claro
+          elevation: 2,
           shadowColor: color.withOpacity(0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

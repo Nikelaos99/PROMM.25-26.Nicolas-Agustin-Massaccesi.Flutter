@@ -20,55 +20,74 @@ class AlertsScreen extends StatelessWidget {
           final now = DateTime.now();
           final today = DateTime(now.year, now.month, now.day);
 
-          // Filtros basados en la lógica de negocio
-          final expired = products.where((p) {
-            if (p.expiryDate == null) return false;
-            return p.expiryDate!.isBefore(today);
-          }).toList();
-
-          final expiresToday = products.where((p) {
-            if (p.expiryDate == null) return false;
-            return p.expiryDate!.year == today.year &&
-                p.expiryDate!.month == today.month &&
-                p.expiryDate!.day == today.day;
-          }).toList();
-
+          final expired = products
+              .where(
+                (p) => p.expiryDate != null && p.expiryDate!.isBefore(today),
+              )
+              .toList();
+          final expiresToday = products
+              .where(
+                (p) =>
+                    p.expiryDate != null &&
+                    p.expiryDate!.day == today.day &&
+                    p.expiryDate!.month == today.month &&
+                    p.expiryDate!.year == today.year,
+              )
+              .toList();
           final expiringSoon = products.where((p) {
             if (p.expiryDate == null) return false;
             final diff = p.expiryDate!.difference(today).inDays;
             return diff > 0 && diff <= 3;
           }).toList();
-
           final lowStock = products.where((p) => p.quantity <= 2).toList();
-
-          if (products.isEmpty) {
-            return const Center(child: Text("No hay productos en tu despensa"));
-          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Sistema de Alertas",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textDark,
+                // Encabezado tipo Tarjeta (Igual a la imagen)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 10,
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Control de caducidad y stock en tiempo real",
-                  style: TextStyle(color: AppColors.textGray, fontSize: 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Sistema de Alertas",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Mantén el control de tu despensa con alertas automáticas de caducidad y stock",
+                        style: TextStyle(
+                          color: AppColors.textGray,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
 
                 if (expired.isNotEmpty)
                   AlertSection(
-                    title: "Productos Vencidos (${expired.length})",
-                    icon: Icons.dangerous_outlined,
+                    title: "⚠️ Productos Vencidos (${expired.length})",
+                    icon: Icons.error_outline,
                     bgColor: AppColors.errorRed,
                     contentColor: AppColors.errorText,
                     products: expired,
@@ -78,20 +97,21 @@ class AlertsScreen extends StatelessWidget {
 
                 if (expiresToday.isNotEmpty)
                   AlertSection(
-                    title: "Vencen HOY (${expiresToday.length})",
+                    title: "🚨 Vencen HOY (${expiresToday.length})",
                     icon: Icons.notification_important_outlined,
                     bgColor: AppColors.warningAmber,
                     contentColor: AppColors.warningText,
                     products: expiresToday,
-                    subtitleBuilder: (p) => "¡Consumir hoy!",
+                    subtitleBuilder: (p) => "Vence HOY",
                   ),
 
                 if (expiringSoon.isNotEmpty)
                   AlertSection(
-                    title: "Próximos a Vencer (${expiringSoon.length})",
+                    title:
+                        "⏰ Próximos a Vencer (3 días) (${expiringSoon.length})",
                     icon: Icons.timer_outlined,
-                    bgColor: AppColors.warningAmber,
-                    contentColor: AppColors.warningText,
+                    bgColor: const Color(0xFFFFFDE7), // Amarillo más claro
+                    contentColor: const Color(0xFFFBC02D),
                     products: expiringSoon,
                     subtitleBuilder: (p) =>
                         "Vence en ${p.expiryDate!.difference(today).inDays} días",
@@ -99,15 +119,15 @@ class AlertsScreen extends StatelessWidget {
 
                 if (lowStock.isNotEmpty)
                   AlertSection(
-                    title: "Bajo Stock (${lowStock.length})",
+                    title: "📦 Bajo Stock (${lowStock.length})",
                     icon: Icons.trending_down_outlined,
                     bgColor: AppColors.infoBlue,
                     contentColor: AppColors.infoText,
                     products: lowStock,
-                    subtitleBuilder: (p) => "Solo quedan ${p.quantity} uds.",
+                    subtitleBuilder: (p) =>
+                        "Solo quedan ${p.quantity.toInt()} uds.",
                   ),
 
-                const SizedBox(height: 8),
                 _buildSummaryCard(
                   expired.length,
                   expiresToday.length,
@@ -134,7 +154,7 @@ class AlertsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Resumen General",
+            "Resumen de Alertas",
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -148,12 +168,12 @@ class AlertsScreen extends StatelessWidget {
             crossAxisCount: 2,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 2.5,
+            childAspectRatio: 1.6, // Ajustado para ser más alto
             children: [
               _summaryItem("$exp", "Vencidos"),
-              _summaryItem("$today", "Hoy"),
-              _summaryItem("$soon", "Próximos"),
-              _summaryItem("$stock", "Stock"),
+              _summaryItem("$today", "Vencen Hoy"),
+              _summaryItem("$soon", "Próximos a Vencer"),
+              _summaryItem("$stock", "Bajo Stock"),
             ],
           ),
         ],
@@ -164,18 +184,20 @@ class AlertsScreen extends StatelessWidget {
   Widget _summaryItem(String count, String label) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
+      padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             count,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 22,
             ),
           ),
           Text(

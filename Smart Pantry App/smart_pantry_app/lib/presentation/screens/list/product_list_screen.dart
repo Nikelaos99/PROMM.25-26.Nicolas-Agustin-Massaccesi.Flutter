@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../data/models/product_model.dart';
 import '../../../core/constants/colors.dart';
+import '../add_product/add_product_manual_screen.dart';
 import 'widgets/product_card.dart';
 
 class ProductListScreen extends StatefulWidget {
@@ -12,9 +13,7 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  // Controlador para el campo de texto
   final TextEditingController _searchController = TextEditingController();
-  // Variable para almacenar el término de búsqueda
   String _searchQuery = "";
 
   @override
@@ -23,15 +22,39 @@ class _ProductListScreenState extends State<ProductListScreen> {
     super.dispose();
   }
 
-  /// Función para eliminar acentos y diacríticos
   String _removeAccents(String text) {
     const withAccents = 'áéíóúüñÁÉÍÓÚÜÑ';
     const withoutAccents = 'aeiouunAEIOUUN';
-
     for (int i = 0; i < withAccents.length; i++) {
       text = text.replaceAll(withAccents[i], withoutAccents[i]);
     }
     return text;
+  }
+
+  void _confirmDelete(BuildContext context, ProductModel product) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("¿Eliminar producto?"),
+        content: Text("Se borrará '${product.name}' definitivamente."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("CANCELAR"),
+          ),
+          TextButton(
+            onPressed: () {
+              product.delete();
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "ELIMINAR",
+              style: TextStyle(color: AppColors.errorText),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -43,16 +66,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
       child: Column(
         children: [
           const SizedBox(height: 20),
-          // Buscador superior
           TextField(
             controller: _searchController,
-            textInputAction:
-                TextInputAction.search, // Cambia botón "Intro" por Lupa
-            onChanged: (value) {
-              setState(() {
-                _searchQuery = value;
-              });
-            },
+            textInputAction: TextInputAction.search,
+            onChanged: (value) => setState(() => _searchQuery = value),
             decoration: InputDecoration(
               hintText: "Buscar productos...",
               prefixIcon: const Icon(
@@ -64,15 +81,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       icon: const Icon(Icons.clear, size: 20),
                       onPressed: () {
                         _searchController.clear();
-                        setState(() {
-                          _searchQuery = "";
-                        });
+                        setState(() => _searchQuery = "");
                       },
                     )
                   : null,
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide.none,
@@ -80,60 +94,26 @@ class _ProductListScreenState extends State<ProductListScreen> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // Lista de productos filtrada
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: productBox.listenable(),
               builder: (context, Box<ProductModel> box, _) {
-                if (box.isEmpty) {
-                  return const Center(
-                    child: Text("Tu despensa está vacía. ¡Empieza a escanear!"),
-                  );
-                }
+                if (box.isEmpty)
+                  return const Center(child: Text("Tu despensa está vacía."));
 
-                // 1. Obtener lista base
-                final allProducts = box.values.toList().reversed.toList();
-
-                // 2. Normalizar la consulta de búsqueda una sola vez
                 final queryNormalized = _removeAccents(
                   _searchQuery.toLowerCase(),
                 );
-
-                // 3. Aplicar el filtro ignorando acentos en nombre, marca y categoría
-                final filteredProducts = allProducts.where((product) {
+                final filteredProducts = box.values.toList().reversed.where((
+                  product,
+                ) {
                   final nameNorm = _removeAccents(product.name.toLowerCase());
                   final brandNorm = _removeAccents(
                     (product.brand ?? "").toLowerCase(),
                   );
-                  final catNorm = _removeAccents(
-                    (product.category ?? "").toLowerCase(),
-                  );
-
                   return nameNorm.contains(queryNormalized) ||
-                      brandNorm.contains(queryNormalized) ||
-                      catNorm.contains(queryNormalized);
+                      brandNorm.contains(queryNormalized);
                 }).toList();
-
-                if (filteredProducts.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.search_off,
-                          size: 60,
-                          color: Colors.grey,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          "No hay resultados para \"$_searchQuery\"",
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
-                }
 
                 return ListView.builder(
                   padding: const EdgeInsets.only(bottom: 100),
@@ -142,10 +122,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     final product = filteredProducts[index];
                     return ProductCard(
                       product: product,
-                      onEdit: () {
-                        // Implementaremos luego
-                      },
-                      onDelete: () => product.delete(),
+                      onEdit: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddProductManualScreen(
+                            productToEdit: product,
+                            hiveKey: product.key as int?,
+                          ),
+                        ),
+                      ),
+                      onDelete: () => _confirmDelete(context, product),
                     );
                   },
                 );
