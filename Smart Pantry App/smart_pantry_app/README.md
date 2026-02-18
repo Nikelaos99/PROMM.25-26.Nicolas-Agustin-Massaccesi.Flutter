@@ -1,16 +1,11 @@
-# smart_pantry_app
+# 🍎 Smart Pantry App
+Gestión inteligente de despensa desarrollada en Flutter.
 
-A new Flutter project.
+## ✨ Características
+* 🔍 Escaneo de productos mediante OpenFoodFacts API.
+* 📅 Control de caducidad y alertas de bajo stock.
+* 💾 Persistencia local con Hive (Offline first).
+* 📤 Importación/Exportación de inventario en formato JSON.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🚀 Instalación
+Puedes descargar el APK listo para instalar desde la sección de [Releases](enlace-a-tu-release).
