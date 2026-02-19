@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A list item widget that displays summary statistics for a specific category.
+///
+/// Shows the unique product count in a badge and the total cumulative units
+/// on the trailing edge. Designed for the category breakdown section in the Dashboard.
 class CategoryItem extends StatelessWidget {
+  /// The display name of the category.
   final String name;
+
+  /// The number of unique product types within this category.
   final int productCount;
+
+  /// The total sum of quantities for all products in this category.
   final int totalUnits;
 
   const CategoryItem({
@@ -24,9 +33,15 @@ class CategoryItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            backgroundColor: AppColors.primaryGreen,
-            radius: 12,
+          // BADGE: Unique product count
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColors.primaryGreen,
+              shape: BoxShape.circle,
+            ),
             child: Text(
               "$productCount",
               style: const TextStyle(
@@ -36,22 +51,26 @@ class CategoryItem extends StatelessWidget {
               ),
             ),
           ),
+
           const SizedBox(width: 12),
-          // --- FIX AQUÍ ---
+
+          // CATEGORY NAME: Flexible to prevent overflow
           Expanded(
             child: Text(
               name,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
-                color: Color(0xFF004D40),
+                color: Color(0xFF004D40), // Dark teal for visual consistency
               ),
               maxLines: 1,
-              overflow: TextOverflow.ellipsis, // Esto pone los "..."
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          // ----------------
-          const SizedBox(width: 8), // Espacio mínimo de seguridad
+
+          const SizedBox(width: 12),
+
+          // TRAILING INFO: Total stock units in category
           Text(
             "$totalUnits unidades",
             style: const TextStyle(

@@ -3,7 +3,13 @@ import '../../../core/constants/colors.dart';
 import 'widgets/login_form.dart';
 import 'widgets/register_form.dart';
 
+/// Screen that handles user authentication, providing both Login and Registration interfaces.
+///
+/// This screen uses a [StatefulWidget] to manage the toggle between the login
+/// and registration forms. It features a modern UI with a custom tab switcher
+/// and smooth transitions.
 class AuthScreen extends StatefulWidget {
+  /// Creates an [AuthScreen] instance.
   const AuthScreen({super.key});
 
   @override
@@ -11,6 +17,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  /// Local state to track which form is currently active.
+  /// `true` for Login, `false` for Registration.
   bool isLogin = true;
 
   @override
@@ -24,10 +32,11 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               const SizedBox(height: 40),
 
+              // Application Branding / Logo Container
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryGreen, // FONDO VERDE
+                  color: AppColors.primaryGreen,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -40,6 +49,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
 
               const SizedBox(height: 16),
+              // Main Title and Subtitle
               Text(
                 "Smart Pantry App",
                 style: TextStyle(
@@ -54,7 +64,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(height: 30),
 
-              // Contenedor Blanco Principal
+              // Main Authentication Card
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -70,7 +80,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Selector de Pestañas
+                    // Custom Tab Switcher (Login vs Register)
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
@@ -93,13 +103,14 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 25),
 
-                    // Switch entre Formularios
+                    // Animated form switcher based on current state
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: isLogin
                           ? const LoginForm()
                           : RegisterForm(
                               onRegistrationSuccess: () {
+                                // Automatically switch back to login upon successful registration
                                 setState(() {
                                   isLogin = true;
                                 });
@@ -116,6 +127,9 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
+  /// Helper method to build a custom tab button.
+  ///
+  /// Takes a [title], an [active] status for styling, and an [onTap] callback.
   Widget _buildTabButton(String title, bool active, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(

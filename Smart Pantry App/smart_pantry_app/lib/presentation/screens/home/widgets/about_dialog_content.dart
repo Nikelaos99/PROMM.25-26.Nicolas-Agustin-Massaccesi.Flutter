@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A detailed bottom sheet content displaying application information,
+/// current user details, and key app features.
+///
+/// Designed to be used within a [showModalBottomSheet] and takes up
+/// most of the screen height.
 class AboutDialogContent extends StatelessWidget {
+  /// The currently authenticated user from Firebase.
   final User? user;
+
   const AboutDialogContent({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Mantenemos el alto al 90% de la pantalla
+      // Responsive height at 90% of the screen
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -17,101 +24,18 @@ class AboutDialogContent extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // 1. HEADER FIJO (No se mueve al hacer scroll)
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryGreen,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      height: 70,
-                      width: 70,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Image.asset(
-                        'assets/images/icon_pantry.png',
-                        fit: BoxFit.contain,
-                        color: AppColors.primaryGreen,
-                        // Si no tienes el asset aún, puedes usar:
-                        // child: Icon(Icons.shopping_bag, color: AppColors.primaryGreen, size: 40),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Smart Pantry App",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Versión 1.0.0",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          // 1. STICKY HEADER
+          _buildHeader(context),
 
-          // 2. CUERPO CON SCROLL
+          // 2. SCROLLABLE BODY
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                // SECCIÓN DE USUARIO
-                Container(
-                  width: double.infinity,
-                  color: AppColors.bgLight,
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Usuario Actual",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF004D40),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildInfoTile(
-                        Icons.person_2_outlined,
-                        "Nombre",
-                        user?.displayName ?? "No disponible",
-                      ),
-                      _buildInfoTile(
-                        Icons.email_outlined,
-                        "Correo",
-                        user?.email ?? "No disponible",
-                      ),
-                    ],
-                  ),
-                ),
+                // USER PROFILE SECTION
+                _buildUserSection(),
 
-                // SECCIÓN DE INFORMACIÓN Y CARACTERÍSTICAS
+                // APP INFO SECTION
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
@@ -145,7 +69,6 @@ class AboutDialogContent extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // Característica 1
                       _buildFeatureItem(
                         Icons.inventory_2_outlined,
                         "Gestión de Inventario",
@@ -153,7 +76,6 @@ class AboutDialogContent extends StatelessWidget {
                         const Color(0xFFE1F5EA),
                         AppColors.primaryGreen,
                       ),
-                      // Característica 2
                       _buildFeatureItem(
                         Icons.notifications_none_outlined,
                         "Alertas de Caducidad",
@@ -161,7 +83,6 @@ class AboutDialogContent extends StatelessWidget {
                         AppColors.warningAmber,
                         AppColors.warningText,
                       ),
-                      // Característica 3 - NUEVA
                       _buildFeatureItem(
                         Icons.qr_code_scanner,
                         "Escaneo de Códigos",
@@ -169,7 +90,6 @@ class AboutDialogContent extends StatelessWidget {
                         const Color(0xFFE3F2FD),
                         Colors.blue.shade700,
                       ),
-                      // Característica 4 - NUEVA
                       _buildFeatureItem(
                         Icons.low_priority,
                         "Control de Bajo Stock",
@@ -179,53 +99,7 @@ class AboutDialogContent extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 40),
-
-                      // PIE DE PÁGINA
-                      Center(
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  "Desarrollado con ",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textGray,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.favorite,
-                                  color: Colors.red,
-                                  size: 14,
-                                ),
-                                const Text(
-                                  " para ti",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textGray,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "© 2026 Smart Pantry App",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const Text(
-                              "Todos los derechos reservados.",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      _buildFooter(),
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -238,6 +112,98 @@ class AboutDialogContent extends StatelessWidget {
     );
   }
 
+  /// Builds the top green header with the logo and app name.
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+      decoration: const BoxDecoration(
+        color: AppColors.primaryGreen,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          Row(
+            children: [
+              Container(
+                height: 70,
+                width: 70,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Image.asset(
+                  'assets/images/icon_pantry.png',
+                  fit: BoxFit.contain,
+                  color: AppColors.primaryGreen,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Smart Pantry App",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Versión 1.0.0",
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the section showing the currently logged-in user info.
+  Widget _buildUserSection() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.bgLight,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Usuario Actual",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF004D40),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildInfoTile(
+            Icons.person_2_outlined,
+            "Nombre",
+            user?.displayName ?? "No disponible",
+          ),
+          _buildInfoTile(
+            Icons.email_outlined,
+            "Correo",
+            user?.email ?? "No disponible",
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Internal helper to build user information rows.
   Widget _buildInfoTile(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -274,6 +240,7 @@ class AboutDialogContent extends StatelessWidget {
     );
   }
 
+  /// Internal helper to build feature description rows.
   Widget _buildFeatureItem(
     IconData icon,
     String title,
@@ -314,6 +281,39 @@ class AboutDialogContent extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the copyright and development attribution footer.
+  Widget _buildFooter() {
+    return Center(
+      child: Column(
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Desarrollado con ",
+                style: TextStyle(fontSize: 12, color: AppColors.textGray),
+              ),
+              const Icon(Icons.favorite, color: Colors.red, size: 14),
+              const Text(
+                " para ti",
+                style: TextStyle(fontSize: 12, color: AppColors.textGray),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "© 2026 Smart Pantry App",
+            style: TextStyle(fontSize: 11, color: Colors.grey),
+          ),
+          const Text(
+            "Todos los derechos reservados.",
+            style: TextStyle(fontSize: 10, color: Colors.grey),
           ),
         ],
       ),

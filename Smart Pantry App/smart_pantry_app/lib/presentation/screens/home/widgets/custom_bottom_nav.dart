@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A custom Bottom Navigation Bar that supports a floating action button notch.
+///
+/// This widget uses [BottomAppBar] to create a "cut-out" effect for a centered FAB.
+/// It notifies the parent of tab changes through the [onTap] callback.
 class CustomBottomNav extends StatelessWidget {
+  /// The currently active tab index.
   final int currentIndex;
+
+  /// Callback function triggered when a navigation item is pressed.
   final Function(int) onTap;
 
   const CustomBottomNav({
@@ -16,15 +23,14 @@ class CustomBottomNav extends StatelessWidget {
     return BottomAppBar(
       elevation: 20,
       color: Colors.white,
+      // Creates the curved notch for the FAB
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,
-      // Eliminamos clipBehavior para que la sombra del notch fluya mejor
       child: SizedBox(
         height: 60,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Lado izquierdo: Inicio y Lista
+            // LEFT SIDE: Home and List
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -35,10 +41,10 @@ class CustomBottomNav extends StatelessWidget {
               ),
             ),
 
-            // Espacio central reservado para el FloatingActionButton
+            // CENTRAL GAP: Reserved for the FloatingActionButton
             const SizedBox(width: 75),
 
-            // Lado derecho: Escanear y Alertas
+            // RIGHT SIDE: Scan and Alerts
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -58,8 +64,11 @@ class CustomBottomNav extends StatelessWidget {
     );
   }
 
+  /// Builds an individual navigation item with an icon and a label.
+  ///
+  /// The appearance changes based on whether the item is [isSelected].
   Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = currentIndex == index;
+    final bool isSelected = currentIndex == index;
 
     return InkWell(
       onTap: () => onTap(index),

@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A panel that provides options for importing and exporting inventory data in JSON format.
+///
+/// This widget is typically displayed as a persistent bottom sheet or a slide-up panel.
+/// It includes data count visualization and safety dialogs for destructive operations.
 class JsonOptionsPanel extends StatelessWidget {
+  /// Callback triggered when the user wants to export the current data.
   final VoidCallback onExport;
-  // Cambiamos el onImport para que reciba el booleano de 'replaceAll'
+
+  /// Callback triggered when a JSON file is selected for import.
+  /// The [bool] parameter indicates if the current data should be replaced (true) or merged (false).
   final Function(bool) onImport;
+
+  /// The current number of items in the inventory, used for display purposes.
   final int productCount;
 
   const JsonOptionsPanel({
@@ -26,6 +35,7 @@ class JsonOptionsPanel extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // DRAG HANDLE (Visual indicator)
           Container(
             width: 40,
             height: 4,
@@ -35,20 +45,28 @@ class JsonOptionsPanel extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
+
+          // EXPORT ACTION
           _buildButton(
             label: "Exportar a JSON",
             icon: Icons.upload_file_rounded,
             color: AppColors.primaryGreen,
             onTap: onExport,
           ),
+
           const SizedBox(height: 12),
+
+          // IMPORT ACTION
           _buildButton(
             label: "Importar desde JSON",
             icon: Icons.file_download_outlined,
             color: const Color(0xFF00BFA5),
             onTap: () => _showImportDialog(context),
           ),
+
           const SizedBox(height: 12),
+
+          // PRODUCT COUNTER FOOTER
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -73,11 +91,12 @@ class JsonOptionsPanel extends StatelessWidget {
     );
   }
 
-  // Diálogo para elegir modo de importación
+  /// Displays a confirmation dialog to choose the import strategy.
   void _showImportDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text("Importar Inventario"),
         content: const Text(
           "¿Deseas añadir los productos al inventario actual o reemplazar todo el contenido?",
@@ -90,14 +109,14 @@ class JsonOptionsPanel extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              onImport(false); // Añadir
+              onImport(false); // Append mode
             },
             child: const Text("Añadir"),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              onImport(true); // Reemplazar
+              onImport(true); // Overwrite mode
             },
             child: const Text(
               "Reemplazar Todo",
@@ -109,6 +128,7 @@ class JsonOptionsPanel extends StatelessWidget {
     );
   }
 
+  /// Internal helper to build uniform action buttons.
   Widget _buildButton({
     required String label,
     required IconData icon,

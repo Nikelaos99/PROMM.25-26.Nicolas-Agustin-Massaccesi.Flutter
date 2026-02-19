@@ -2,9 +2,19 @@ import 'package:flutter/material.dart';
 import '../../../../data/models/product_model.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A card widget that visually represents a [ProductModel].
+///
+/// Displays product imagery, quantity, and expiration status with
+/// conditional styling based on urgency. Provides action buttons
+/// for editing and deletion.
 class ProductCard extends StatelessWidget {
+  /// The product data to display.
   final ProductModel product;
+
+  /// Callback triggered when the user taps the edit button.
   final VoidCallback onEdit;
+
+  /// Callback triggered when the user taps the delete button.
   final VoidCallback onDelete;
 
   const ProductCard({
@@ -14,8 +24,9 @@ class ProductCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  // --- LÓGICA DE FECHAS Y ESTADOS ---
+  // --- LOGIC: DATES AND STATES ---
 
+  /// Returns a human-readable string representing the expiration status.
   String _getExpiryText() {
     if (product.expiryDate == null) return "Sin fecha";
 
@@ -29,18 +40,21 @@ class ProductCard extends StatelessWidget {
 
     final difference = expiry.difference(today).inDays;
 
-    if (difference < 0) return "Vencido";
-    if (difference == 0) return "Vence hoy";
-    if (difference == 1) return "Vence mañana";
+    if (difference < 0) return "Caducado";
+    if (difference == 0) return "Caduca hoy";
+    if (difference == 1) return "Caduca mañana";
     return "En $difference días";
   }
 
+  /// Determines if the product is expired or close to expiring (within 3 days).
   bool _isUrgent() {
     if (product.expiryDate == null) return false;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final difference = product.expiryDate!.difference(today).inDays;
-    return difference >= 0 && difference <= 3;
+
+    // Returns true if expired (negative) or expires in 3 days or less.
+    return difference <= 3;
   }
 
   @override
@@ -53,31 +67,14 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // IMAGEN DEL PRODUCTO
+          // PRODUCT IMAGE HEADER
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: Container(
               height: 160,
               width: double.infinity,
               color: Colors.white,
-              child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                  ? Image.network(
-                      product.imageUrl!,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primaryGreen,
-                            ),
-                          ),
-                        );
-                      },
-                      errorBuilder: (_, __, ___) => _buildPlaceholder(),
-                    )
-                  : _buildPlaceholder(),
+              child: _buildProductImage(),
             ),
           ),
 
@@ -86,7 +83,7 @@ class ProductCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // NOMBRE Y CANTIDAD
+                // NAME AND QUANTITY ROW
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -103,27 +100,11 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.bgLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        "${product.quantity}",
-                        style: const TextStyle(
-                          color: AppColors.primaryGreen,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    _buildQuantityBadge(),
                   ],
                 ),
 
-                // MARCA
+                // BRAND INFO
                 Text(
                   product.brand ?? "Marca genérica",
                   style: const TextStyle(
@@ -134,53 +115,31 @@ class ProductCard extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // FILAS DE INFORMACIÓN (Categoría y Vencimiento)
+                // INFORMATION ROWS
                 _buildInfoRow("Categoría:", product.category ?? "General"),
                 _buildInfoRow(
-                  "Vence:",
+                  "Estado:",
                   _getExpiryText(),
                   isUrgent: _isUrgent(),
                 ),
 
                 const Divider(height: 32, thickness: 0.5),
 
-                // BOTONES DE ACCIÓN
+                // ACTION BUTTONS
                 Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onEdit,
-                        icon: const Icon(Icons.edit_outlined, size: 18),
-                        label: const Text("Editar"),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryGreen,
-                          side: BorderSide(
-                            color: AppColors.primaryGreen.withOpacity(0.3),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
+                    _buildActionButton(
+                      label: "Editar",
+                      icon: Icons.edit_outlined,
+                      onPressed: onEdit,
+                      color: AppColors.primaryGreen,
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onDelete,
-                        icon: const Icon(Icons.delete_outline, size: 18),
-                        label: const Text("Eliminar"),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.errorText,
-                          side: BorderSide(
-                            color: AppColors.errorText.withOpacity(0.3),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
+                    _buildActionButton(
+                      label: "Eliminar",
+                      icon: Icons.delete_outline,
+                      onPressed: onDelete,
+                      color: AppColors.errorText,
                     ),
                   ],
                 ),
@@ -192,6 +151,49 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  // --- WIDGET BUILDERS (MODULARIZATION) ---
+
+  /// Builds the product image using [Image.network] with error handling.
+  Widget _buildProductImage() {
+    if (product.imageUrl == null || product.imageUrl!.isEmpty) {
+      return _buildPlaceholder();
+    }
+
+    return Image.network(
+      product.imageUrl!,
+      fit: BoxFit.contain,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+          ),
+        );
+      },
+      errorBuilder: (_, __, ___) => _buildPlaceholder(),
+    );
+  }
+
+  /// Stylized badge to show the current stock quantity.
+  Widget _buildQuantityBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.bgLight,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        "x${product.quantity.toInt()}",
+        style: const TextStyle(
+          color: AppColors.primaryGreen,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  /// Common placeholder for missing or broken images.
   Widget _buildPlaceholder() {
     return Container(
       color: Colors.grey[50],
@@ -201,7 +203,7 @@ class ProductCard extends StatelessWidget {
           Icon(Icons.inventory_2_outlined, size: 40, color: AppColors.textGray),
           SizedBox(height: 8),
           Text(
-            "Sin imagen",
+            "Imagen no disponible",
             style: TextStyle(color: AppColors.textGray, fontSize: 12),
           ),
         ],
@@ -209,24 +211,19 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  /// Helper to build a labeled info row with optional urgent styling.
   Widget _buildInfoRow(String label, String value, {bool isUrgent = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.textGray,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: AppColors.textGray)),
           if (isUrgent)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.errorRed,
+                color: AppColors.errorRed.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -247,6 +244,30 @@ class ProductCard extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  /// Modular button builder for the action row.
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return Expanded(
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
+        label: Text(label),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: color,
+          side: BorderSide(color: color.withOpacity(0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        ),
       ),
     );
   }

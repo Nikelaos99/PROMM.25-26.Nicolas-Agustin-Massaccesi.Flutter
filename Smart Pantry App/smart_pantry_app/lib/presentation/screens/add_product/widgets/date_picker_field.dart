@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/colors.dart';
 
+/// A custom form field that triggers a date picker when tapped.
+///
+/// This component displays a descriptive label and a stylized container
+/// that shows either a placeholder text or the formatted [selectedDate].
 class DatePickerField extends StatelessWidget {
+  /// The currently selected date to be displayed.
   final DateTime? selectedDate;
+
+  /// The text label displayed above the field.
   final String label;
+
+  /// Callback function triggered when the user taps the field.
   final VoidCallback onTap;
 
   const DatePickerField({
@@ -18,16 +27,19 @@ class DatePickerField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // FIELD LABEL
         Padding(
           padding: const EdgeInsets.only(top: 20, bottom: 8),
           child: Text(
             label,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark, // Usando AppColors.textDark
+              color: AppColors.textDark,
             ),
           ),
         ),
+
+        // INTERACTIVE FIELD CONTAINER
         InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -42,6 +54,7 @@ class DatePickerField extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // FORMATTED DATE OR PLACEHOLDER
                 Text(
                   selectedDate == null
                       ? "Seleccionar fecha"
@@ -52,6 +65,8 @@ class DatePickerField extends StatelessWidget {
                         : Colors.black87,
                   ),
                 ),
+
+                // CALENDAR ICON
                 const Icon(
                   Icons.calendar_today_outlined,
                   color: AppColors.primaryGreen,

@@ -1,8 +1,13 @@
-// lib/presentation/screens/splash/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'widgets/three_dots_loading.dart';
 
+/// Initial entry screen displayed during application startup.
+///
+/// This screen provides a branded experience while the app performs background
+/// initialization tasks, such as determining authentication status via [AuthWrapper]
+/// or loading local databases.
 class SplashScreen extends StatelessWidget {
+  /// Creates a [SplashScreen] instance.
   const SplashScreen({super.key});
 
   @override
@@ -10,11 +15,11 @@ class SplashScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF00A67E),
       body: Center(
-        // Asegura que todo el bloque de contenido esté perfectamente centrado
+        // Ensures all content blocks are perfectly centered on the screen
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 1. Logo: Contenedor blanco con bolsa escalada
+            // 1. Logo Branding: A white container holding the scaled pantry icon.
             Container(
               width: 120,
               height: 120,
@@ -41,7 +46,7 @@ class SplashScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // 2. Título Principal
+            // 2. Application Main Title
             const Text(
               "Smart Pantry App",
               style: TextStyle(
@@ -54,7 +59,7 @@ class SplashScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // 3. Eslogan (Añadido)
+            // 3. Application Slogan for branding reinforcement
             const Text(
               "Gestiona tu despensa inteligentemente",
               textAlign: TextAlign.center,
@@ -67,7 +72,7 @@ class SplashScreen extends StatelessWidget {
 
             const SizedBox(height: 50),
 
-            // 4. Animación de tres puntos
+            // 4. Custom loading indicator to signal background activity
             const SizedBox(height: 20, child: ThreeDotsLoading()),
           ],
         ),

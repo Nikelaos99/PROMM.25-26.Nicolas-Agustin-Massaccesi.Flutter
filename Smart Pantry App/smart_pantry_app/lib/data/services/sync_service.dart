@@ -4,28 +4,46 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/product_model.dart';
 
+/// Service responsible for bidirectional data synchronization between local storage and the cloud.
+///
+/// This service implements the **Singleton Pattern** to ensure a single instance
+/// handles all synchronization tasks, preventing race conditions. It connects
+/// the local [Hive] database with [Firebase Firestore].
 class SyncService {
-  // Patrón Singleton: permite acceder a la misma instancia desde cualquier sitio
+  /// Singleton instance of [SyncService].
   static final SyncService _instance = SyncService._internal();
+
+  /// Factory constructor to return the existing [_instance].
   factory SyncService() => _instance;
+
+  /// Private internal constructor for the singleton pattern.
   SyncService._internal();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final String _boxName = 'pantry_box';
 
-  // --- CONTROLADOR DEL ESTADO DE SINCRONIZACIÓN ---
-  // true = cargando, false = terminado
+  /// Controller to manage and broadcast the current synchronization status.
+  ///
+  /// Emits `true` when a process is running and `false` when it completes.
   final _syncStatusController = StreamController<bool>.broadcast();
+
+  /// Public [Stream] to allow the UI to react to synchronization state changes.
   Stream<bool> get isSyncingStream => _syncStatusController.stream;
 
-  /// Sincroniza los datos locales hacia la nube (Firestore)
+  /// Uploads all local pantry products to the user's private [Firestore] document.
+  ///
+  /// It transforms the [ProductModel] objects into JSON maps and stores them
+  /// under the user's unique ID. It uses a merge strategy to preserve other
+  /// document fields like metadata.
+  ///
+  /// Requires an authenticated user.
   Future<void> uploadPantryToCloud() async {
     final user = _auth.currentUser;
     if (user == null) return;
 
     try {
-      // Avisamos que la carga ha comenzado
+      // Signals the start of the synchronization process
       _syncStatusController.add(true);
 
       final box = Hive.box<ProductModel>(_boxName);
@@ -33,24 +51,29 @@ class SyncService {
           .map((p) => p.toJson())
           .toList();
 
+      // Updates Firestore document with the current pantry list and a server-side timestamp
       await _firestore.collection('users').doc(user.uid).set({
         'pantry': productsJson,
         'last_updated': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
-      print("☁️ Sincronización exitosa: Datos subidos a Firestore");
-
-      // Esperamos un segundo extra para que el usuario vea el spinner/nube
+      // Visual delay to ensure the UI feedback is perceptible to the user
       await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
-      print("❌ Error al subir datos a Firestore: $e");
+      // Internal logging for debugging purposes
+      print("❌ Error uploading data to Firestore: $e");
     } finally {
-      // Avisamos que ha terminado (vuelve el icono de check)
+      // Signals the end of the synchronization process
       _syncStatusController.add(false);
     }
   }
 
-  /// Descarga los datos de la nube hacia el almacenamiento local (Hive)
+  /// Downloads pantry data from [Firestore] and replaces the local [Hive] content.
+  ///
+  /// This method performs a complete overwrite of the local database with
+  /// the data retrieved from the cloud to ensure consistency across devices.
+  ///
+  /// Requires an authenticated user and an existing Firestore document.
   Future<void> downloadPantryFromCloud() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -66,6 +89,7 @@ class SyncService {
           final List<dynamic> remoteProducts = data['pantry'];
           final box = Hive.box<ProductModel>(_boxName);
 
+          // Clears local database before importing cloud data
           await box.clear();
 
           for (var item in remoteProducts) {
@@ -74,12 +98,11 @@ class SyncService {
             );
             await box.add(product);
           }
-          print("📥 Sincronización exitosa: Datos descargados de Firestore");
         }
       }
       await Future.delayed(const Duration(milliseconds: 500));
     } catch (e) {
-      print("❌ Error al descargar datos de Firestore: $e");
+      print("❌ Error downloading data from Firestore: $e");
     } finally {
       _syncStatusController.add(false);
     }

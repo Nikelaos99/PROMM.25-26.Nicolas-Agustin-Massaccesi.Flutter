@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/constants/colors.dart';
-// Asumiendo que tu SyncService tiene un stream de estado, si no, usaremos un ejemplo básico
 import '../../../../data/services/sync_service.dart';
 import 'about_dialog_content.dart';
 
+/// A custom application bar that handles branding, cloud synchronization status,
+/// and user account management.
+///
+/// It implements [PreferredSizeWidget] to provide a standard [AppBar] height.
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// Callback triggered to show or hide the JSON debugging panel.
   final VoidCallback onToggleJsonPanel;
 
   const CustomAppBar({super.key, required this.onToggleJsonPanel});
@@ -13,10 +17,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
+  /// Signs out the current user from Firebase Authentication.
   void _handleLogout() async {
     await FirebaseAuth.instance.signOut();
   }
 
+  /// Displays a bottom sheet with information about the app and the current user.
   void _showAboutModal(BuildContext context, User? user) {
     showModalBottomSheet(
       context: context,
@@ -46,9 +52,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        // --- AQUÍ ESTÁ EL ICONO DE LA NUBE ---
         _buildSyncIndicator(),
         IconButton(
+          tooltip: "Ver JSON",
           icon: const Icon(
             Icons.description_outlined,
             color: Color(0xFF004D40),
@@ -61,7 +67,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // Widget separado para el logo leading
+  /// Builds the app's logo icon wrapped in a styled container.
   Widget _buildLogo() {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
@@ -82,14 +88,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // INDICADOR DE SINCRONIZACIÓN
+  /// Builds a reactive sync indicator that switches between a loading spinner
+  /// and a "cloud done" icon based on the [SyncService] state.
   Widget _buildSyncIndicator() {
-    // Usamos el Stream de SyncService para saber si está trabajando
     return StreamBuilder<bool>(
-      stream: SyncService()
-          .isSyncingStream, // Necesitarás crear este getter en tu SyncService
+      stream: SyncService().isSyncingStream,
       builder: (context, snapshot) {
-        bool isSyncing = snapshot.data ?? false;
+        final bool isSyncing = snapshot.data ?? false;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -106,18 +111,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 )
-              : const Icon(
-                  Icons.cloud_done_outlined,
-                  color: AppColors.primaryGreen,
-                  size: 24,
+              : const Tooltip(
+                  message: "Sincronizado con la nube",
+                  child: Icon(
+                    Icons.cloud_done_outlined,
+                    color: AppColors.primaryGreen,
+                    size: 24,
+                  ),
                 ),
         );
       },
     );
   }
 
+  /// Builds the user profile menu with account details and action buttons.
   Widget _buildUserMenu(BuildContext context, User? user) {
-    // ... (Tu código de _buildUserMenu se mantiene igual)
     return Theme(
       data: Theme.of(context).copyWith(
         hoverColor: Colors.transparent,
