@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the importProductsFromFile method from the LocalStorageService class, for the Dart programming language.">
+  <title>importProductsFromFile method - LocalStorageService class - local_storage library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">smart_pantry_app</a></li>
+    <li><a href="../../data_services_local_storage/">data\services\local_storage.dart</a></li>
+    <li><a href="../../data_services_local_storage/LocalStorageService-class.html">LocalStorageService</a></li>
+    <li class="self-crumb">importProductsFromFile method</li>
+  </ol>
+  <div class="self-name">importProductsFromFile</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="data_services_local_storage&#47;LocalStorageService-class-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">importProductsFromFile</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype"><a href="https://api.flutter.dev/flutter/flutter_test/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
+<span class="name ">importProductsFromFile</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="importProductsFromFile-param-replaceAll"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">replaceAll</span>, </span></li>
+</ol>})
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Opens the native file picker to select a JSON backup and restores the data.</p>
+<p>The <code>replaceAll</code> parameter determines the restoration strategy:</p>
+<ul>
+<li>If <code>true</code>: Wipes the existing database before importing new records.</li>
+<li>If <code>false</code>: Merges new records, skipping items with existing barcodes.</li>
+</ul>
+<p>Returns <code>true</code> if the process completes successfully, or <code>false</code> if the
+user cancels the file selection.</p>
+<p>Throws an <a href="https://api.flutter.dev/flutter/dart-core/Exception-class.html">Exception</a> if the JSON structure is invalid or file reading fails.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;bool&gt; importProductsFromFile({required bool replaceAll}) async {
+  try {
+    &#47;&#47; 1. Invoke file picker for .json extension only
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [&#39;json&#39;],
+    );
+
+    if (result != null &amp;&amp; result.files.single.path != null) {
+      final file = File(result.files.single.path!);
+      final String content = await file.readAsString();
+
+      &#47;&#47; 2. Parse the JSON string into a dynamic list
+      final List&lt;dynamic&gt; decodedData = jsonDecode(content);
+      final box = Hive.box&lt;ProductModel&gt;(HiveProvider.boxName);
+
+      &#47;&#47; 3. Clear existing data if full replacement is requested
+      if (replaceAll) {
+        await box.clear();
+      }
+
+      &#47;&#47; 4. Iterate and insert products into the local box
+      for (var item in decodedData) {
+        final product = ProductModel.fromJson(item as Map&lt;String, dynamic&gt;);
+
+        &#47;&#47; Basic deduplication logic: skip if barcode already exists in merge mode
+        if (!replaceAll) {
+          bool exists = box.values.any((p) =&gt; p.barcode == product.barcode);
+          if (exists) continue;
+        }
+
+        await box.add(product);
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    throw Exception(&quot;Error importing data: $e&quot;);
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">smart_pantry_app</a></li>
+    <li><a href="../../data_services_local_storage/">local_storage</a></li>
+    <li><a href="../../data_services_local_storage/LocalStorageService-class.html">LocalStorageService</a></li>
+    <li class="self-crumb">importProductsFromFile method</li>
+</ol>
+
+    <h5>LocalStorageService class</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    smart_pantry_app
+      1.0.0+1
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
